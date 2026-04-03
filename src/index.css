@@ -1,0 +1,13 @@
+/* Force the app to be exactly the size of the screen with no overflow */
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden; /* This stops all scrolling */
+  background-color: #000;
+}
+
+canvas {
+  display: block; /* Removes tiny extra space at the bottom of the canvas */
+}
