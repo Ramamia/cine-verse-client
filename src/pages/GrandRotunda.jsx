@@ -51,8 +51,8 @@ export default function GrandRotunda({ config }) {
       <primitive 
         ref={compassRef} 
         object={compass} 
-        position={[0, -0.9, 0]} 
-        scale={2.2} 
+        position={[0, 2.9, 10]} 
+        scale={9.2} 
       />
 
       {/* 2. GLB DOORS WITH HOVER LOGIC */}
@@ -72,15 +72,26 @@ export default function GrandRotunda({ config }) {
           </Float>
           
           {/* 3. COOL GENRE POPUP */}
-          {hoveredGenre?.id === g.id && (
-            <Html distanceFactor={12} position={[0, 4.5, 0]} center>
-              <div style={popupStyle(g.color)}>
-                <h3 style={popupTitle}>{g.name}</h3>
-                <p style={popupDesc}>{g.desc}</p>
-                <div style={pulseEffect(g.color)} />
-              </div>
-            </Html>
-          )}
+// Change the popup return in GrandRotunda.jsx to look sleeker:
+{hoveredGenre?.id === g.id && (
+  <Html distanceFactor={10} position={[0, 4, 0]} center>
+    <div style={{
+      background: 'rgba(0,0,0,0.4)',
+      color: 'white',
+      padding: '15px 25px',
+      borderLeft: `3px solid ${g.color}`,
+      textAlign: 'center',
+      backdropFilter: 'blur(10px)',
+      boxShadow: `0 0 40px ${g.color}33`,
+      width: '180px'
+    }}>
+      <h3 style={{ margin: 0, letterSpacing: '5px', fontSize: '1rem' }}>{g.name}</h3>
+      <h4 style={{ margin: '5px 0', fontSize: '0.75rem', opacity: 0.8  ,fontWeight: 'normal'}}>{g.desc}</h4>
+      <div style={{ height: '1px', background: g.color, margin: '10px 0', opacity: 0.5 }} />
+      <p style={{ fontSize: '0.65rem', opacity: 0.7, margin: 0 , color: g.color , fontWeight: 'bold'}}>ENTER PORTAL</p>
+    </div>
+  </Html>
+)}
         </group>
       ))}
 
@@ -105,7 +116,7 @@ const popupStyle = (color) => ({
   width: '220px',
   textAlign: 'center',
   backdropFilter: 'blur(15px)',
-  boxShadow: `0 10px 30px rgba(0,0,0,0.8), 0 0 15px ${color}33`,
+  boxShadow: `0 10px 30px rgba(0,0,0,0.3), 0 0 15px ${color}33`,
   pointerEvents: 'none',
   fontFamily: '"Courier New", Courier, monospace',
   transition: '0.3s ease-in-out'
