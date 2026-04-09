@@ -14,10 +14,11 @@ const CustomizePanel = ({ config, setConfig, onFinish }) => {
     HAIR: [
       { id: 'marilyn', name: 'Monroe Blonde', vid: '/videos/marilyn.mp4' }
     ],
-    COLOR: [
-      { id: '#cb186c', name: 'Pink' },
-      { id: '#06973d', name: 'Green' },
+   COLOR: [
+      { id: 'pink', name: 'Pink', colorCode: '#cb186c' },
+      { id: 'green', name: 'Green', colorCode: '#06973d' },
     ]
+
   };
 
   const isEquipped = () => {
@@ -28,17 +29,16 @@ const CustomizePanel = ({ config, setConfig, onFinish }) => {
     return false;
   };
 
-  const handleEquipToggle = () => {
+const handleEquipToggle = () => {
     if (!selectedLocal) return;
     const equipped = isEquipped();
     const val = equipped ? null : selectedLocal.id;
 
     if (activeTab === 'ACCESSORIES') setConfig({ ...config, acc: val });
-    if (activeTab === 'HAIR') setConfig({ ...config, hair: val });
-    if (activeTab === 'COLOR') setConfig({ ...config, skin: val });
+    else if (activeTab === 'HAIR') setConfig({ ...config, hair: val });
+    else if (activeTab === 'COLOR') setConfig({ ...config, skin: val });
   };
-
-  return (
+    return (
     <motion.div initial={{ x: 100, opacity: 0 }} animate={{ x: 0, opacity: 1 }} style={panelStyle}>
       <div style={tabContainer}>
         {['ACCESSORIES', 'HAIR', 'COLOR'].map((tab) => (

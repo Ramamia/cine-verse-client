@@ -179,15 +179,20 @@ function App() {
 
 
         <Suspense fallback={null}>
+
           <ambientLight intensity={0.4} />
           
           {/* Main lighting adjusts slightly for the Hub */}
           <spotLight position={[0, 10, 0]} intensity={step === 'hub' ? 30 : 20} angle={0.5} penumbra={1} castShadow />
 
-          {step === 'entrance' && <Entrance />}
-          {step === 'customize' && <CharacterCreator config={config} />}
-          {step === 'hub' && <GrandRotunda config={config} />}
+{/* 1. Only show Entrance in the beginning */}
+{step === 'entrance' && <Entrance />}
 
+{/* 2. Only show Character Creator during customization */}
+{step === 'customize' && <CharacterCreator config={config} />}
+
+{/* 3. STRICT CHECK: Only show Hub when actually in the Hub */}
+{step === 'hub' && <GrandRotunda config={config} />}
           {/* Floor remains consistent but changes color with environment */}
           <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1, 0]}>
             <planeGeometry args={[100, 100]} />

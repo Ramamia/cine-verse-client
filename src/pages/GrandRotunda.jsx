@@ -3,6 +3,8 @@ import { useFrame } from '@react-three/fiber';
 import { useGLTF, Float, Html, Sparkles } from '@react-three/drei';
 
 export default function GrandRotunda({ config }) {
+  if (!config) return null; 
+
   const [hoveredGenre, setHoveredGenre] = useState(null);
   const compassRef = useRef();
 
