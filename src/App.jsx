@@ -10,6 +10,7 @@ import CustomizePanel from './components/ui/CustomizePanel.jsx';
 
 function App() {
   const [step, setStep] = useState('entrance'); 
+  const [selectedGenre, setSelectedGenre] = useState('ALL');
   const [config, setConfig] = useState({ 
     acc: null, 
     hair: null, 
@@ -43,6 +44,15 @@ function App() {
   const handleSearch = (val) => {
     console.log("Searching TMDB for:", val);
   };
+
+  const getGenreColor = (genre) => {
+  switch(genre) {
+    case 'ROM-COM': return '#ff69b4';
+    case 'HORROR': return '#760707';
+    case 'SCI-FI': return '#00d4ff';
+    default: return '#760707'; // Cine-Verse Red
+  }
+};
 
   return (
     <div style={{ width: '100vw', height: '100vh', overflow: 'hidden', position: 'relative', background: '#000' }}>
@@ -86,18 +96,37 @@ function App() {
             </div>
           </div>
 
-          <div style={searchWrapper}>
-             <input 
-               type="text" 
-               placeholder="DISCOVER CINEMA..." 
-               style={searchField} 
-               onChange={(e) => handleSearch(e.target.value)}
-             />
-             <div style={searchAccent} />
-          </div>
-        </>
-      )}
-      
+{/* COOLER SEARCH BAR WITH INTEGRATED FILTERS */}
+<div style={searchWrapper}>
+      <div style={searchGlassContainer}>
+        <input 
+          type="text" 
+          placeholder={`SEARCHING ${selectedGenre === 'ALL' ? 'CINEMA' : selectedGenre}...`} 
+          style={searchField} 
+          onChange={(e) => handleSearch(e.target.value)}
+        />
+        
+        {/* CLICKABLE FILTER BAR */}
+        <div style={filterBar}>
+          {['ALL', 'ROM-COM', 'HORROR', 'SCI-FI'].map((genre) => (
+            <div 
+              key={genre} 
+              onClick={() => setSelectedGenre(genre)}
+              style={{
+                ...filterTab, 
+                color: selectedGenre === genre ? getGenreColor(genre) : '#555',
+                borderBottom: selectedGenre === genre ? `1px solid ${getGenreColor(genre)}` : '1px solid transparent'
+              }}
+            >
+              {genre}
+            </div>
+          ))}
+        </div>
+      </div>
+      <div style={{...searchAccent, background: getGenreColor(selectedGenre), boxShadow: `0 0 15px ${getGenreColor(selectedGenre)}` }} />
+    </div>
+  </>
+)}      
       <Canvas 
         shadows 
         // Camera position now updates when the step changes
@@ -107,14 +136,21 @@ function App() {
         <fog attach="fog" args={[currentSettings.bg, currentSettings.fogNear, currentSettings.fogFar]} />
 
         {/* OrbitControls enabled only in the hub for free movement */}
-        {step === 'hub' && (
-          <OrbitControls 
-            enablePan={false} 
-            maxPolarAngle={Math.PI / 2.1} 
-            minDistance={5} 
-            maxDistance={20} 
-          />
-        )}
+{step === 'hub' && (
+  <OrbitControls 
+    enablePan={false} 
+    // Limits looking up and down significantly
+    maxPolarAngle={Math.PI / 2.2} 
+    minPolarAngle={Math.PI / 2.5}
+    minDistance={8} 
+    maxDistance={14} 
+    target={[3.5, 3, 2]}
+    enableRotate={true}
+    // Limits rotation to a very small left/right nudge
+    minAzimuthAngle={-Math.PI / 12} 
+    maxAzimuthAngle={Math.PI / 12}
+  />
+)}
 
         <Suspense fallback={null}>
           <ambientLight intensity={0.4} />
@@ -147,12 +183,36 @@ function App() {
   );
 }
 
-// Ensure searchWrapper and other new styles are included
-const searchWrapper = { position: 'absolute', top: '30px', left: '50%', transform: 'translateX(-50%)', zIndex: 100, width: '450px' };
-const searchField = { width: '100%', background: 'rgba(0,0,0,0.8)', border: '1px solid #760707', padding: '15px 30px', color: '#fff', letterSpacing: '4px', outline: 'none', backdropFilter: 'blur(10px)', fontSize: '0.7rem', textAlign: 'center' };
-const searchAccent = { width: '60px', height: '2px', background: '#760707', margin: '0 auto', boxShadow: '0 0 10px #760707' };
+const searchWrapper = { 
+  position: 'absolute', top: '30px', left: '50%', transform: 'translateX(-50%)', 
+  zIndex: 100, width: '500px', display: 'flex', flexDirection: 'column', alignItems: 'center' 
+};
 
-const sidePanelStyle = { position: 'absolute', left: '30px', top: '50%', transform: 'translateY(-50%)', width: '280px', background: 'rgba(10, 0, 0, 0.7)', padding: '25px', borderRadius: '2px', borderLeft: '3px solid #760707', zIndex: 100, backdropFilter: 'blur(10px)' };
+const searchGlassContainer = {
+  width: '100%', background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(20px)', 
+  border: '1px solid rgba(255, 255, 255, 0.05)', padding: '10px', borderRadius: '4px',
+  boxShadow: '0 10px 40px rgba(0,0,0,0.8)'
+};
+
+const filterBar = { 
+  display: 'flex', justifyContent: 'center', gap: '25px', marginTop: '5px', 
+  padding: '10px 0', borderTop: '1px solid rgba(255,255,255,0.05)' 
+};
+
+const filterTab = {
+  fontSize: '0.65rem', letterSpacing: '2px', cursor: 'pointer', transition: '0.3s all ease',
+  fontWeight: 'bold', textTransform: 'uppercase', paddingBottom: '4px'
+};
+const searchField = { 
+  width: '100%', background: 'transparent', border: 'none', padding: '15px 0', 
+  color: '#fff', letterSpacing: '4px', outline: 'none', fontSize: '0.8rem', 
+  textAlign: 'center' 
+};
+const searchAccent = { 
+  width: '100px', height: '2px', marginTop: '12px', transition: '0.5s all ease' 
+};
+
+const sidePanelStyle = { position: 'absolute', left: '20px',height: '35%', top: '75%', transform: 'translateY(-50%)', width: '260px', background: 'rgba(10, 0, 0, 0.4)', padding: '23px', borderRadius: '2px', borderLeft: '4px solid #760707', zIndex: 100, backdropFilter: 'blur(10px)' };
 const panelHeader = { color: '#760707', letterSpacing: '5px', marginBottom: '25px', fontSize: '0.8rem' };
 const feedItem = { marginBottom: '20px', paddingBottom: '10px', borderBottom: '1px solid #222' };
 const userRow = { display: 'flex', justifyContent: 'space-between', color: '#fff', fontSize: '0.75rem', marginBottom: '5px' };
