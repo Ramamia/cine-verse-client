@@ -10,6 +10,7 @@ import CustomizePanel from './components/ui/CustomizePanel.jsx';
 
 function App() {
   const [step, setStep] = useState('entrance'); 
+  const [isLoading, setIsLoading] = useState(false);
   const [selectedGenre, setSelectedGenre] = useState('ALL');
   const [config, setConfig] = useState({ 
     acc: null, 
@@ -36,8 +37,20 @@ function App() {
       fogNear: 10, 
       fogFar: 40, 
       camPos: [0, 5, 12] 
-    }
+    },
+    genrePage: { bg: '#050000', camPos: [0, 2, 15], fogNear: 5, fogFar: 30 }
   };
+
+  const enterGenrePortal = (genreId) => {
+  setIsLoading(true);
+  setActiveGenre(genreId);
+  
+  // You can adjust this time (10000ms = 10 seconds)
+  setTimeout(() => {
+    setIsLoading(false);
+    setStep('genrePage');
+  }, 10000); 
+};
 
   const currentSettings = roomSettings[step] || roomSettings.hub;
 
@@ -161,6 +174,7 @@ function App() {
 
         {/* OrbitControls enabled only in the hub for free movement */}
 {step === 'hub' && (
+  
   <OrbitControls 
     enablePan={false} 
     // Limits looking up and down significantly
@@ -192,7 +206,10 @@ function App() {
 {step === 'customize' && <CharacterCreator config={config} />}
 
 {/* 3. STRICT CHECK: Only show Hub when actually in the Hub */}
-{step === 'hub' && <GrandRotunda config={config} />}
+{step === 'hub' && <GrandRotunda 
+    config={config} 
+    enterGenrePortal={enterGenrePortal} // PASS THE PROP
+  />}
           {/* Floor remains consistent but changes color with environment */}
           <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1, 0]}>
             <planeGeometry args={[100, 100]} />
@@ -207,6 +224,14 @@ function App() {
             />
           </mesh>
           <Environment preset="night" />
+          {isLoading && <LoadingScreen genre={activeGenre} />}
+  
+  {step === 'genrePage' && (
+    <GenreRoom 
+      genre={activeGenre} 
+      onBack={() => setStep('hub')} 
+    />
+  )}
         </Suspense>
       </Canvas>
       <Loader />
