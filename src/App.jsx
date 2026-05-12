@@ -1,31 +1,45 @@
 import React, { useState, Suspense } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { Loader, MeshReflectorMaterial, Environment, OrbitControls } from '@react-three/drei';
-import Entrance from './pages/Entrance';
+
+// Pages (full-screen scenes)
+import Entrance        from './pages/Entrance';
 import CharacterCreator from './pages/CharacterCreator';
-import GrandRotunda from './pages/GrandRotunda'; 
-import AuthModal from './components/ui/AuthModal';
-import Header from './components/ui/Header';
-import CustomizePanel from './components/ui/CustomizePanel.jsx';
-import LoadingScreen from './pages/LoadingScreen';
+import GrandRotunda    from './pages/GrandRotunda';
+import LoadingScreen   from './pages/LoadingScreen';
 
+// UI components
+import Header          from './components/ui/Header';
+import AuthModal       from './components/ui/AuthModal';
+import CustomizePanel  from './components/ui/CustomizePanel';
+import SearchBar       from './components/ui/SearchBar';
+import CineSocialFeed  from './components/ui/CineSocialFeed';
+
+// Styles
+import { roomSettings } from './styles/theme';
+import {
+  searchWrapper, searchGlassContainer, filterBar, filterTab,
+  searchField, searchAccent,
+  sidePanelStyle, panelHeader, feedItem, userRow, ratingStyle, commentStyle,
+  customizeHeader, titleStyle,
+  genreUI, backBtn, genreTitle,
+} from './styles/hubStyles';
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+const GENRE_COLORS = {
+  'ROM-COM': '#ff69b4',
+  'HORROR':  '#433636',
+  'SCI-FI':  '#00d4ff',
+};
+const getGenreColor = (genre) => GENRE_COLORS[genre] ?? '#760707';
+
+// ─── App ──────────────────────────────────────────────────────────────────────
 function App() {
-  const [step, setStep] = useState('entrance'); 
-  const [isLoading, setIsLoading] = useState(false);
-  const [activeGenre, setActiveGenre] = useState(null);
+  const [step,          setStep]          = useState('entrance');
+  const [isLoading,     setIsLoading]     = useState(false);
+  const [activeGenre,   setActiveGenre]   = useState(null);
   const [selectedGenre, setSelectedGenre] = useState('ALL');
-  const [config, setConfig] = useState({ 
-    acc: null, 
-    hair: null, 
-    skin: '#ffdbac' 
-  });
-
-  const roomSettings = {
-    entrance: { bg: '#160101', fogNear: 5, fogFar: 25, camPos: [2, 7, 13] },
-    customize: { bg: '#050000', fogNear: 2, fogFar: 15, camPos: [0, 4, 10] },
-    hub: { bg: '#1f1919', fogNear: 10, fogFar: 40, camPos: [0, 5, 12] },
-    genrePage: { bg: '#050000', camPos: [0, 2, 15], fogNear: 5, fogFar: 30 }
-  };
+  const [config,        setConfig]        = useState({ acc: null, hair: null, skin: '#ffdbac' });
 
   const enterGenrePortal = (genreId) => {
     setIsLoading(true);
@@ -33,27 +47,18 @@ function App() {
     setTimeout(() => {
       setIsLoading(false);
       setStep('genrePage');
-    }, 10000); 
+    }, 10000);
   };
 
-  const currentSettings = roomSettings[step] || roomSettings.hub;
+  const handleSearch = (val) => console.log('Searching TMDB for:', val);
 
-  const handleSearch = (val) => console.log("Searching TMDB for:", val);
-
-  const getGenreColor = (genre) => {
-    switch(genre) {
-      case 'ROM-COM': return '#ff69b4';
-      case 'HORROR': return '#433636';
-      case 'SCI-FI': return '#00d4ff';
-      default: return '#760707';
-    }
-  };
+  const currentSettings = roomSettings[step] ?? roomSettings.hub;
 
   return (
     <div style={{ width: '100vw', height: '100vh', overflow: 'hidden', position: 'relative', background: '#000' }}>
-      
-      {/* --- UI LAYER (OUTSIDE CANVAS) --- */}
-      
+
+      {/* ── UI LAYER (outside Canvas) ─────────────────────────────────────── */}
+
       {isLoading && <LoadingScreen genre={activeGenre} />}
 
       {step === 'entrance' && (
@@ -68,82 +73,65 @@ function App() {
           <div style={customizeHeader}>
             <h1 style={titleStyle}>DESIGN YOUR IDENTITY</h1>
           </div>
-          <CustomizePanel 
-            config={config} 
-            setConfig={setConfig} 
-            onFinish={() => setStep('hub')} 
-          />
+          <CustomizePanel config={config} setConfig={setConfig} onFinish={() => setStep('hub')} />
         </>
       )}
 
       {step === 'hub' && (
-        <>
-          <div style={sidePanelStyle}>
-            <h4 style={panelHeader}>CINE-SOCIAL</h4>
-            <div style={feedItem}>
-              <div style={userRow}><b>Lara</b> <span style={ratingStyle}>★ 4</span></div>
-              <p style={commentStyle}>"The twist in Scream 6 blew my mind!"</p>
-            </div>
-            <div style={feedItem}>
-              <div style={userRow}><b>Fahed</b> <span style={ratingStyle}>★ 2.9</span></div>
-              <p style={commentStyle}>"I can't believe the ending of that movie it sucks"</p>
-            </div>
-                        <div style={feedItem}>
-              <div style={userRow}><b>Lilia</b> <span style={ratingStyle}>★ 4.5</span></div>
-              <p style={commentStyle}>"minecraft movie was AMAZINGG"</p>
-            </div>
-          </div>
-
-          <div style={searchWrapper}>
-            <div style={searchGlassContainer}>
-              <input 
-                type="text" 
-                placeholder={`SEARCHING ${selectedGenre === 'ALL' ? 'CINEMA' : selectedGenre}...`} 
-                style={searchField} 
-                onChange={(e) => handleSearch(e.target.value)}
-              />
-              <div style={filterBar}>
-                {['ALL', 'ROM-COM', 'HORROR', 'SCI-FI'].map((genre) => (
-                  <div key={genre} onClick={() => setSelectedGenre(genre)}
-                    style={{
-                      ...filterTab, 
-                      color: selectedGenre === genre ? getGenreColor(genre) : '#555',
-                      borderBottom: selectedGenre === genre ? `1px solid ${getGenreColor(genre)}` : '1px solid transparent'
-                    }}>
-                    {genre}
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div style={{...searchAccent, background: getGenreColor(selectedGenre), boxShadow: `0 0 15px ${getGenreColor(selectedGenre)}` }} />
-          </div>
-        </>
-      )}
+  <>
+    <CineSocialFeed />
+    <SearchBar onSearch={handleSearch} />
+  </>
+)}
 
       {step === 'genrePage' && (
         <div style={genreUI}>
-           <button onClick={() => setStep('hub')} style={backBtn}>← BACK TO ROTUNDA</button>
-           <h1 style={genreTitle}>{activeGenre?.toUpperCase()} VAULT</h1>
+          <button onClick={() => setStep('hub')} style={backBtn}>← BACK TO ROTUNDA</button>
+          <h1 style={genreTitle}>{activeGenre?.toUpperCase()} VAULT</h1>
         </div>
       )}
 
-      {/* --- 3D LAYER --- */}
+      {/* ── 3D LAYER ──────────────────────────────────────────────────────── */}
 
       <Canvas shadows camera={{ position: currentSettings.camPos, fov: 50 }}>
         <color attach="background" args={[currentSettings.bg]} />
         <fog attach="fog" args={[currentSettings.bg, currentSettings.fogNear, currentSettings.fogFar]} />
 
-        {step === 'entrance' && <OrbitControls enablePan={false} enableZoom={false} enableRotate={true} minDistance={180} maxDistance={200} target={[-2, 10, 5]} minAzimuthAngle={-Math.PI / 16} maxAzimuthAngle={Math.PI / 16} minPolarAngle={Math.PI / 2.5} maxPolarAngle={Math.PI / 2.1} />}
-        {step === 'hub' && <OrbitControls enablePan={false} maxPolarAngle={Math.PI / 2.2} minPolarAngle={Math.PI / 2.5} minDistance={10} maxDistance={16} target={[3.5, 4, 2]} enableRotate={true} minAzimuthAngle={-Math.PI / 12} maxAzimuthAngle={Math.PI / 12} />}
+        {step === 'entrance' && (
+          <OrbitControls
+            enablePan={false} enableZoom={false} enableRotate
+            minDistance={180} maxDistance={200}
+            target={[-2, 10, 5]}
+            minAzimuthAngle={-Math.PI / 16} maxAzimuthAngle={Math.PI / 16}
+            minPolarAngle={Math.PI / 2.5}   maxPolarAngle={Math.PI / 2.1}
+          />
+        )}
+        {step === 'hub' && (
+          <OrbitControls
+            enablePan={false}
+            maxPolarAngle={Math.PI / 2.2} minPolarAngle={Math.PI / 2.5}
+            minDistance={10} maxDistance={16}
+            target={[3.5, 4, 2]}
+            enableRotate
+            minAzimuthAngle={-Math.PI / 12} maxAzimuthAngle={Math.PI / 12}
+          />
+        )}
 
         <Suspense fallback={null}>
           <ambientLight intensity={0.4} />
-          <spotLight position={[0, 10, 0]} intensity={step === 'hub' ? 30 : 20} angle={0.5} penumbra={1} castShadow />
+          <spotLight
+            position={[0, 10, 0]}
+            intensity={step === 'hub' ? 30 : 20}
+            angle={0.5}
+            penumbra={1}
+            castShadow
+          />
 
-          {step === 'entrance' && <Entrance />}
+          {step === 'entrance'  && <Entrance />}
           {step === 'customize' && <CharacterCreator config={config} />}
-          {step === 'hub' && <GrandRotunda config={config} enterGenrePortal={enterGenrePortal} />}
+          {step === 'hub'       && <GrandRotunda config={config} enterGenrePortal={enterGenrePortal} />}
 
+          {/* Reflective floor */}
           <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1, 0]}>
             <planeGeometry args={[100, 100]} />
             <MeshReflectorMaterial
@@ -152,63 +140,18 @@ function App() {
               mixBlur={1}
               mixStrength={40}
               roughness={1}
-              color={step === 'hub' ? "#696666" : "#312b2b"}
+              color={step === 'hub' ? '#696666' : '#312b2b'}
               metalness={0.5}
             />
           </mesh>
+
           <Environment preset="night" />
         </Suspense>
       </Canvas>
+
       <Loader />
     </div>
   );
 }
-
-const searchWrapper = { 
-  position: 'absolute', top: '30px', left: '50%', transform: 'translateX(-50%)', 
-  zIndex: 100, width: '500px', display: 'flex', flexDirection: 'column', alignItems: 'center' 
-};
-
-const searchGlassContainer = {
-  width: '100%', background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(20px)', 
-  border:  '1px solid rgba(255, 255, 255, 0.05)', padding: '10px', borderRadius: '4px',
-  boxShadow: '0 10px 40px rgba(0,0,0,0.8)'
-};
-
-const filterBar = { 
-  display: 'flex', justifyContent: 'center', gap: '25px', marginTop: '5px', 
-  padding:'10px 0', borderTop: '1px solid rgba(255,255,255,0.05)' 
-  };
-
-const filterTab = {
-  fontSize: '0.65rem', letterSpacing: '2px', cursor: 'pointer', transition: '0.3s all ease',
-  fontWeight: 'bold', textTransform: 'uppercase', paddingBottom: '4px'
-};
-const searchField = { 
-  width: '100%', background: 'transparent', border: 'none', padding: '15px 0', 
-  color: '#fff', letterSpacing: '4px', outline: 'none', fontSize: '0.8rem', 
-  textAlign: 'center' 
-};
-const searchAccent = { 
-  width: '100px', height: '2px', marginTop: '12px', transition: '0.5s all ease' 
-};
-
-const sidePanelStyle = { position: 'absolute', left: '20px',height: '35%', top: '75%', transform: 'translateY(-50%)', width: '260px', background: 'rgba(10, 0, 0, 0.4)', padding: '23px', borderRadius: '2px', borderLeft: '4px solid #760707', zIndex: 100, backdropFilter: 'blur(10px)' };
-const panelHeader = { color: '#760707', letterSpacing: '5px', marginBottom: '25px', fontSize: '0.8rem' };
-const feedItem = { marginBottom: '20px', paddingBottom: '10px', borderBottom: '1px solid #222' };
-const userRow = { display: 'flex', justifyContent: 'space-between', color: '#fff', fontSize: '0.75rem', marginBottom: '5px' };
-const ratingStyle = { color: '#ffd700', fontSize: '0.65rem' };
-const commentStyle = { color: '#999', fontSize: '0.7rem', margin: 0, fontStyle: 'italic', lineHeight: '1.4' };
-
-const customizeHeader = { position: 'absolute', top: '40px', left: '40px', zIndex: 10 };
-const titleStyle = { color: '#fff', fontSize: '2rem', letterSpacing: '10px', fontWeight: '900', textShadow: '0 0 20px rgba(118, 7, 7, 0.5)' };
-
-const subtitleStyle = { color: '#888', letterSpacing: '3px', fontSize: '0.8rem', marginTop: '10px', textTransform: 'uppercase', fontWeight: 'bold' };
-const hubOverlay = { position: 'absolute', top: '10%', width: '100%', textAlign: 'center', zIndex: 10, pointerEvents: 'none' };
-const hubTitle = { color: '#fff', fontSize: '1.5rem', letterSpacing: '15px', fontWeight: 'bold' };
-
-const genreUI = { position: 'absolute', top: '40px', left: '40px', zIndex: 1000 };
-const backBtn = { background: 'rgba(0,0,0,0.5)', border: '1px solid #760707', color: '#fff', padding: '12px 24px', cursor: 'pointer', letterSpacing: '2px', backdropFilter: 'blur(10px)' };
-const genreTitle = { color: '#fff', letterSpacing: '10px', marginTop: '20px', fontSize: '1.5rem' };
 
 export default App;
