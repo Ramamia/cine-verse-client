@@ -4,8 +4,14 @@ import Avatar from '../components/3d/Avatar';
 
 // Preload all avatar variants up-front so they're ready when the user picks one
 useGLTF.preload('/models/base_avatar.glb');
-useGLTF.preload('/models/pink_avatar.glb');
-useGLTF.preload('/models/green_avatar.glb');
+useGLTF.preload('/models/pink.glb');
+useGLTF.preload('/models/green.glb');
+useGLTF.preload('/models/cowboy pink.glb');
+useGLTF.preload('/models/cowboy green.glb');
+useGLTF.preload('/models/glasses pink.glb');
+useGLTF.preload('/models/glasses green.glb');
+useGLTF.preload('/models/monroe hair pink.glb');
+useGLTF.preload('/models/monroe hair green.glb');
 
 export default function CharacterCreator({ config }) {
   const { scene: cowboy  } = useGLTF('/models/cowboy_hat.glb');

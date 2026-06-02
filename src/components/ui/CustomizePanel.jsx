@@ -7,7 +7,7 @@ import {
 } from '../../styles/componentStyles';
 import { colors } from '../../styles/theme';
 
-const TABS = ['ACCESSORIES', 'HAIR', 'COLOR'];
+const TABS = ['COLOR', 'ACCESSORIES', 'HAIR'];
 
 const CATALOG = {
   ACCESSORIES: [
@@ -24,8 +24,10 @@ const CATALOG = {
 };
 
 const CustomizePanel = ({ config, setConfig, onFinish }) => {
-  const [activeTab,    setActiveTab]    = useState('ACCESSORIES');
+  const [activeTab,    setActiveTab]    = useState('COLOR');
   const [selectedItem, setSelectedItem] = useState(null);
+
+  const hasChosenColor = config?.skin === 'pink' || config?.skin === 'green';
 
   const isEquipped = () => {
     if (!selectedItem) return false;
@@ -38,9 +40,18 @@ const CustomizePanel = ({ config, setConfig, onFinish }) => {
   const handleEquipToggle = () => {
     if (!selectedItem) return;
     const newVal = isEquipped() ? null : selectedItem.id;
-    if (activeTab === 'ACCESSORIES') setConfig({ ...config, acc:  newVal });
-    else if (activeTab === 'HAIR')   setConfig({ ...config, hair: newVal });
-    else if (activeTab === 'COLOR')  setConfig({ ...config, skin: newVal });
+    if (activeTab === 'ACCESSORIES') {
+      setConfig({ ...config, acc: newVal, hair: null });
+    } else if (activeTab === 'HAIR') {
+      setConfig({ ...config, hair: newVal, acc: null });
+    } else if (activeTab === 'COLOR') {
+      if (newVal === null) {
+        // Reset to default skin and clear accessories/hair
+        setConfig({ skin: '#ffdbac', acc: null, hair: null });
+      } else {
+        setConfig({ ...config, skin: newVal });
+      }
+    }
   };
 
   const isActive = (item) =>
@@ -53,41 +64,102 @@ const CustomizePanel = ({ config, setConfig, onFinish }) => {
 
       {/* Tabs */}
       <div style={tabContainer}>
-        {TABS.map((tab) => (
-          <div
-            key={tab}
-            onClick={() => { setActiveTab(tab); setSelectedItem(null); }}
-            style={{
-              ...tabBtn,
-              color:        activeTab === tab ? '#fff' : '#555',
-              borderBottom: activeTab === tab ? `2px solid ${colors.themeRed}` : '2px solid transparent',
-            }}
-          >
-            {tab}
-          </div>
-        ))}
+        {TABS.map((tab) => {
+          const isDisabled = (tab === 'ACCESSORIES' || tab === 'HAIR') && !hasChosenColor;
+          return (
+            <div
+              key={tab}
+              onClick={() => {
+                if (isDisabled) return;
+                setActiveTab(tab);
+                setSelectedItem(null);
+              }}
+              style={{
+                ...tabBtn,
+                color:        isDisabled ? '#444' : (activeTab === tab ? '#fff' : '#888'),
+                cursor:       isDisabled ? 'not-allowed' : 'pointer',
+                borderBottom: activeTab === tab ? `2px solid ${colors.themeRed}` : '2px solid transparent',
+                opacity:      isDisabled ? 0.4 : 1,
+              }}
+            >
+              {tab} {isDisabled && '🔒'}
+            </div>
+          );
+        })}
       </div>
 
       {/* Options grid */}
       <div style={contentBody}>
         <p style={label}>{activeTab} OPTIONS</p>
+
+        {!hasChosenColor && (
+          <div style={{
+            background: 'rgba(203, 24, 108, 0.1)',
+            border: '1px solid rgba(203, 24, 108, 0.3)',
+            borderRadius: '6px',
+            padding: '12px',
+            margin: '0 0 15px 0',
+            color: '#cb186c',
+            fontSize: '0.8rem',
+            textAlign: 'center',
+            letterSpacing: '1px',
+            fontWeight: 'bold',
+            fontFamily: 'monospace'
+          }}>
+            ⚠️ CHOOSE A SKIN COLOR FIRST TO UNLOCK ACCESSORIES
+          </div>
+        )}
+
         <div style={optionGrid}>
-          {CATALOG[activeTab].map((item) => (
-            <div
-              key={item.id}
-              onClick={() => setSelectedItem(item)}
-              style={{
-                ...optionBox,
-                border: (selectedItem?.id === item.id || isActive(item))
-                  ? `2px solid ${colors.themeRed}`
-                  : '1px solid #222',
-              }}
-            >
-              {activeTab === 'COLOR'
-                ? <div style={{ ...boxInner, background: item.colorCode }} />
-                : <video src={item.vid} autoPlay loop muted playsInline style={videoStyle} />}
-            </div>
-          ))}
+          {CATALOG[activeTab].map((item) => {
+            const isComingSoon = item.id === 'glasses' || item.id === 'marilyn';
+            return (
+              <div
+                key={item.id}
+                onClick={() => {
+                  if (isComingSoon) return;
+                  setSelectedItem(item);
+                }}
+                style={{
+                  ...optionBox,
+                  position: 'relative',
+                  cursor: isComingSoon ? 'not-allowed' : 'pointer',
+                  border: (selectedItem?.id === item.id || isActive(item))
+                    ? `2px solid ${colors.themeRed}`
+                    : '1px solid #222',
+                  opacity: isComingSoon ? 0.65 : 1,
+                }}
+              >
+                {activeTab === 'COLOR'
+                  ? <div style={{ ...boxInner, background: item.colorCode }} />
+                  : <video src={item.vid} autoPlay loop muted playsInline style={videoStyle} />}
+                
+                {isComingSoon && (
+                  <div style={{
+                    position: 'absolute',
+                    inset: 0,
+                    background: 'rgba(0, 0, 0, 0.75)',
+                    backdropFilter: 'blur(3px)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#ff4b4b',
+                    fontSize: '0.65rem',
+                    fontWeight: 'bold',
+                    letterSpacing: '1px',
+                    fontFamily: 'monospace',
+                    textAlign: 'center',
+                    pointerEvents: 'none',
+                    borderRadius: '4px',
+                    border: '1px solid rgba(255, 75, 75, 0.3)',
+                    padding: '4px'
+                  }}>
+                    COMING SOON
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       </div>
 
