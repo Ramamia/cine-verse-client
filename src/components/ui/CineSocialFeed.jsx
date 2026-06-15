@@ -4,7 +4,7 @@ import {
 } from '../../styles/hubStyles';
 
 const FEED_ITEMS = [
-  { user: 'Lara',  rating: '★ 4',   comment: '"The twist in Scream 6 blew my mind!"' },
+  { user: 'Lara', rating: '★ 4', comment: '"The twist in Scream 6 blew my mind!"' },
   { user: 'Fahed', rating: '★ 2.9', comment: '"I can\'t believe the ending of that movie it sucks"' },
   { user: 'Lilia', rating: '★ 4.5', comment: '"minecraft movie was AMAZINGG"' },
 ];
@@ -13,10 +13,10 @@ const CineSocialFeed = ({ feedItems = FEED_ITEMS, following = [], onToggleFollow
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div 
-      style={{ 
-        ...sidePanelStyle, 
-        display: 'flex', 
+    <div
+      style={{
+        ...sidePanelStyle,
+        display: 'flex',
         flexDirection: 'column',
         transform: isOpen ? 'translateY(-50%)' : 'translateY(-50%) translateX(calc(-100% - 20px))',
         transition: 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
@@ -42,7 +42,7 @@ const CineSocialFeed = ({ feedItems = FEED_ITEMS, following = [], onToggleFollow
           color: #fff !important;
         }
       `}</style>
-      
+
       {/* Toggle Drawer Button sticking out to the right */}
       <button
         className="social-toggle-btn"
@@ -76,7 +76,7 @@ const CineSocialFeed = ({ feedItems = FEED_ITEMS, following = [], onToggleFollow
           transition: 'all 0.3s ease',
         }}
       >
-        <span style={{ fontSize: '13px', lineHeight: 1 }}>💬</span>
+        <span style={{ fontSize: '13px', lineHeight: 1 }}></span>
         <span style={{ writingMode: 'vertical-lr', textOrientation: 'mixed', letterSpacing: '1px' }}>
           {isOpen ? 'CLOSE ◀' : 'SOCIAL ▶'}
         </span>
