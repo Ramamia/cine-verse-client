@@ -329,23 +329,6 @@ export default function ProfilePopup({ user, config, setUser, onClose, onEditAva
             </Canvas>
           </div>
 
-          <button
-            onClick={() => {
-              onClose();
-              onEditAvatar && onEditAvatar();
-            }}
-            style={editAvatarBtnStyle}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = 'rgba(118, 7, 7, 0.15)';
-              e.currentTarget.style.transform = 'scale(1.03)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = 'transparent';
-              e.currentTarget.style.transform = 'scale(1)';
-            }}
-          >
-            CUSTOMIZE AVATAR
-          </button>
 
           <div style={dragNoticeStyle}>-- DRAG TO ROTATE --</div>
         </div>

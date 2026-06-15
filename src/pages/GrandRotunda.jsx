@@ -13,7 +13,7 @@ const GENRES = [
     scale: 2.6,
     rotY: -5.7,
     lightPos: [0, -1, 3],
-    popupPos: [-1, 5.5, -5],
+    popupPos: [-5, 5.5, -5],
     actionText: 'CLICK TO ENTER THIS LOVEY DOVEY ROOM',
   },
   {
@@ -26,7 +26,7 @@ const GENRES = [
     scale: 2.6,
     rotY: 0,
     lightPos: [9, 1, 1.2],
-    popupPos: [9, 5.5, 0],
+    popupPos: [5, 5.5, 0],
     actionText: 'ENTER IF YOU DARE',
   },
   {
@@ -39,7 +39,7 @@ const GENRES = [
     scale: 2.6,
     rotY: 5.9,
     lightPos: [15.5, 5, 7],
-    popupPos: [15.5, 5.5, 7],
+    popupPos: [15.5, 5.5, -4],
     actionText: 'CLICK TO EXPLORE SOMETHING SPOOKY',
   },
 ];
@@ -50,7 +50,6 @@ function GenreDoor({ genre, onEnter }) {
   return (
     <group
       position={genre.pos}
-      onPointerOver={(e) => { e.stopPropagation(); }}
       onClick={() => onEnter(genre.id)}
     >
       <pointLight
@@ -113,7 +112,7 @@ export default function GrandRotunda({ config, enterGenrePortal }) {
 
           {hoveredGenre?.id === g.id && (
             <Html
-              distanceFactor={12}
+              distanceFactor={10}
               position={g.popupPos}
               center
               transform
