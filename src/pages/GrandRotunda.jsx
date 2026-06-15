@@ -41,6 +41,7 @@ const GENRES = [
     lightPos: [15.5, 5, 7],
     popupPos: [15.5, 5.5, -4],
     actionText: 'CLICK TO EXPLORE SOMETHING SPOOKY',
+    distanceFactor: 12,
   },
 ];
 
@@ -66,9 +67,7 @@ function GenreDoor({ genre, onEnter }) {
   );
 }
 
-export default function GrandRotunda({ config, enterGenrePortal }) {
-  if (!config) return null;
-
+export default function GrandRotunda({ enterGenrePortal }) {
   const [hoveredGenre, setHoveredGenre] = useState(null);
   const compassRef = useRef();
 
@@ -112,7 +111,7 @@ export default function GrandRotunda({ config, enterGenrePortal }) {
 
           {hoveredGenre?.id === g.id && (
             <Html
-              distanceFactor={10}
+              distanceFactor={g.distanceFactor || 10}
               position={g.popupPos}
               center
               transform

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+// eslint-disable-next-line no-unused-vars
 import { motion } from 'framer-motion';
 
 export default function MovieDetailPopup({ movie, user, setUser, onClose, onAddReview, followedFriends = [], genre = 'horror' }) {
@@ -20,7 +21,7 @@ export default function MovieDetailPopup({ movie, user, setUser, onClose, onAddR
       }));
     } else {
       if (currentFavorites.length >= 5) {
-        alert('You can only select up to 5 favorite movies in your profile.');
+        window.dispatchEvent(new CustomEvent('show-alert', { detail: 'YOU CAN ONLY SELECT UP TO 5 FAVORITE MOVIES IN YOUR PROFILE.' }));
         return;
       }
       setUser(prev => ({
@@ -38,7 +39,7 @@ export default function MovieDetailPopup({ movie, user, setUser, onClose, onAddR
   const handleRecommend = (e) => {
     e.preventDefault();
     if (!selectedFriend) {
-      alert('Please select a followed user to recommend to.');
+      window.dispatchEvent(new CustomEvent('show-alert', { detail: 'PLEASE SELECT A FOLLOWED USER TO RECOMMEND TO.' }));
       return;
     }
     setRecommendationMessage(`Success: Sent recommendation of "${movie.title}" to ${selectedFriend}!`);
@@ -48,7 +49,7 @@ export default function MovieDetailPopup({ movie, user, setUser, onClose, onAddR
   const handleSubmitReview = (e) => {
     e.preventDefault();
     if (!comment.trim()) {
-      alert('Please write a review comment.');
+      window.dispatchEvent(new CustomEvent('show-alert', { detail: 'PLEASE WRITE A REVIEW COMMENT.' }));
       return;
     }
     
@@ -61,7 +62,7 @@ export default function MovieDetailPopup({ movie, user, setUser, onClose, onAddR
       });
     }
 
-    alert('Your review has been successfully posted to Cine-Social!');
+    window.dispatchEvent(new CustomEvent('show-alert', { detail: 'YOUR REVIEW HAS BEEN SUCCESSFULLY POSTED TO CINE-SOCIAL!' }));
     setComment('');
   };
   // ── Theme Colors based on genre ──

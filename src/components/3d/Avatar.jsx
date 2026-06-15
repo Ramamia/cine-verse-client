@@ -6,105 +6,30 @@ import { useKeyboard } from '../../hooks/useKeyboard';
 import { clone } from 'three/examples/jsm/utils/SkeletonUtils';
 
 
-// Expose model offsets here so they can be easily customized by the user.
-// You can adjust position [x, y, z], scale, and rotation [x, y, z] (in radians) for each model.
-export const MODEL_OFFSETS = {
-  '/models/base_avatar.glb': {
-    position: [-0.2, 1.5, 8.3],
-    scale: 2.5,
-    rotation: [0, 0, 0]
-  },
-  '/models/pink.glb': {
-    position: [-7.28, 0.4, -4.9],
-    scale: 2.5,
-    rotation: [0, 0, 0]
-  },
-  '/models/green.glb': {
-    position: [-7.28, 0.4, -4.9],
-    scale: 2.5,
-    rotation: [0, 0, 0]
-  },
-  '/models/cowboy pink.glb': {
-    position:[-6.54, 0.32, -0.5],
-    scale: 0.5,
-    rotation: [0, 0, 0]
-  },
-  '/models/cowboy green.glb': {
-    position: [-2.78, 0.62, -0.38],
-    scale: 0.5,
-    rotation: [0, 0, 0]
-  },
-  '/models/glasses pink.glb': {
-    position: [-1.47, 0, -1.39],
-    scale: 0.125,
-    rotation: [0, 0, 0]
-  },
-  '/models/glasses green.glb': {
-    position: [0, 0, 0],
-    scale: 2.5,
-    rotation: [0, 0, 0]
-  },
-  '/models/monroe hair pink.glb': {
-    position: [-1.47, 0, -0.87],
-    scale: 0.125,
-    rotation: [0, 0, 0]
-  },
-  '/models/monroe hair green.glb': {
-    position: [-0.51, 0, -0.87],
-    scale: 0.125,
-    rotation: [0, 0, 0]
-  }
-};
+import { MODEL_OFFSETS, getModelPath } from './AvatarConfig';
 
-
-export function getModelPath(config) {
-  let modelPath = '/models/base_avatar.glb';
-  if (config?.skin === 'pink') {
-    if (config.acc === 'cowboy') {
-      modelPath = '/models/cowboy pink.glb';
-    } else if (config.acc === 'glasses') {
-      modelPath = '/models/glasses pink.glb';
-    } else if (config.hair === 'marilyn') {
-      modelPath = '/models/monroe hair pink.glb';
-    } else {
-      modelPath = '/models/pink.glb';
-    }
-  } else if (config?.skin === 'green') {
-    if (config.acc === 'cowboy') {
-      modelPath = '/models/cowboy green.glb';
-    } else if (config.acc === 'glasses') {
-      modelPath = '/models/glasses green.glb';
-    } else if (config.hair === 'marilyn') {
-      modelPath = '/models/monroe hair green.glb';
-    } else {
-      modelPath = '/models/green.glb';
-    }
-  }
-  return modelPath;
-}
-
-export default function Avatar({ config, accessories = {}, isPreview = false, isProfile = false }) {
+export default function Avatar({ config, isPreview = false }) {
   const group = useRef();
 
-  // 1. Resolve the correct model path based on selected skin color and accessories.
+  // 1. figure out which model file to use based on what the user picked
   const modelPath = getModelPath(config);
 
-  // 2. Load the base avatar (for skeletal animations and reference sizing) and the selected model.
+  // 2. load the main skeleton and then the actual model they selected
   const baseAvatar = useGLTF('/models/base_avatar.glb');
   const { scene, animations: modelAnimations } = useGLTF(modelPath);
 
-  // Clone the scene to isolate instances (stretching/positioning in Profile vs customization)
+  // clone the scene so we can have multiple avatars at once without them breaking each other
   const clonedScene = React.useMemo(() => {
     if (!scene) return null;
     return clone(scene);
   }, [scene]);
 
-  // Use the animations from base_avatar if the loaded model has no embedded clips.
+  // grab animations from the base avatar if this custom one doesn't have its own
   const animations = modelAnimations.length > 0 ? modelAnimations : baseAvatar.animations;
   const { actions }           = useAnimations(animations, group);
   const { forward, backward, left, right } = useKeyboard();
 
-  // 3. Dynamically set the skin color of the body mesh to match the user config color.
+  // 3. color the skin mesh to match whatever they chose
   const skinColorMap = {
     pink: '#cb186c',
     green: '#06973d',
@@ -115,15 +40,15 @@ export default function Avatar({ config, accessories = {}, isPreview = false, is
   useEffect(() => {
     if (!clonedScene) return;
 
-    // Check if a root 'base_avatar' node exists in the scene hierarchy.
+    // check if the main skeleton is actually there
     let baseAvatarNodeExists = false;
     clonedScene.traverse((n) => {
       if (n.name === 'base_avatar') baseAvatarNodeExists = true;
     });
 
     clonedScene.traverse((child) => {
-      // If a 'base_avatar' node is present in the file, filter out duplicate mesh elements
-      // that are not parented under it.
+      // hide all the weird duplicated meshes that aren't attached to the main skeleton
+      // so it doesn't look like a horror movie
       let isFromMainAvatar = true;
       if (baseAvatarNodeExists) {
         let curr = child;
@@ -169,7 +94,7 @@ export default function Avatar({ config, accessories = {}, isPreview = false, is
     });
   }, [clonedScene, targetColor, config]);
 
-  // Swap between idle and walk animations
+  // swap between standing around and walking when you press keys
   useEffect(() => {
     if (!actions || animations.length === 0) return;
     const isMoving    = forward || backward || left || right;
@@ -185,7 +110,7 @@ export default function Avatar({ config, accessories = {}, isPreview = false, is
     }
   }, [forward, backward, left, right, actions, animations]);
 
-  // Movement & camera follow
+  // camera following logic for walking around the rooms
   useFrame((state, delta) => {
     if (isPreview) return;
     if (!group.current) return;
@@ -208,7 +133,7 @@ export default function Avatar({ config, accessories = {}, isPreview = false, is
     );
   });
 
-  // 4. Retrieve position, scale, and rotation offsets from the user-customizable offsets config
+  // 4. grab the position and scale tweaks we saved for this specific model
   const offsets = MODEL_OFFSETS[modelPath] ?? {
     position: [0, 0, 0],
     scale: 2.5,
@@ -218,9 +143,8 @@ export default function Avatar({ config, accessories = {}, isPreview = false, is
   return (
     <group ref={group} name="avatar-isolation-container">
       {/* 
-        We use the modelPath as a key to force React Three Fiber to completely 
-        unmount the old scene and mount the new scene, preventing stale references 
-        and ensuring animations bind correctly to the new mesh structure.
+        using the path as a key so react properly remounts it when you change models
+        otherwise the bones get all twisted up
       */}
       <primitive
         key={modelPath}

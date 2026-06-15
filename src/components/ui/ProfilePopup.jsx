@@ -1,29 +1,48 @@
-import React, { Suspense, useState } from 'react';
+import React, { useState } from 'react';
+// eslint-disable-next-line no-unused-vars
 import { motion } from 'framer-motion';
-import { Canvas } from '@react-three/fiber';
-import { OrbitControls, useGLTF } from '@react-three/drei';
-import Avatar, { MODEL_OFFSETS } from '../3d/Avatar';
+import {
+  overlayStyle, ticketStyle, leftStubStyle, rightStubStyle, dividerStyle,
+  topTearCircleStyle, bottomTearCircleStyle, dividerLineStyle, ticketHeaderStyle,
+  logoWrapperStyle, vipBadgeStyle, profileGridStyle, credentialsColumnStyle,
+  bioColumnStyle, bioTextareaStyle, fieldStyle, fieldLabelStyle, fieldValueStyle,
+  moviesSectionStyle, movieSlotsContainerStyle, movieCardStyle, emptyMovieCardStyle,
+  emptyCardNumberStyle, moviePosterStyle, moviePosterFallbackStyle, movieFallbackTitleStyle,
+  movieRemoveOverlayStyle, removeBtnTextStyle, searchSectionStyle, searchFormStyle,
+  movieSearchInputStyle, movieSearchBtnStyle, searchErrorStyle, searchResultsContainerStyle,
+  searchResultItemStyle, searchResultPosterStyle, searchResultPosterFallbackStyle,
+  searchResultDetailsStyle, searchResultTitleStyle, addMovieBtnStyle, noResultsStyle,
+  barcodeContainerStyle, barcodeLinesStyle, barcodeNumberStyle, closeBtnStyle,
+  viewerLabelStyle, canvasContainerStyle, photoboothFrameStyle, photoboothImageStyle,
+  photoboothContainerStyle, filmStripStyle
+} from '../../styles/profilePopupStyles';
 
-export default function ProfilePopup({ user, config, setUser, onClose, onEditAvatar }) {
-  // Load accessories for the 3D Avatar render
-  const { scene: cowboy } = useGLTF('/models/cowboy_hat.glb');
-  const { scene: glasses } = useGLTF('/models/cinema_glasses.glb');
-  const { scene: hair } = useGLTF('/models/monroe_hair.glb');
-  const accessories = { cowboy, glasses, hair };
+export default function ProfilePopup({ user, config, setUser, onClose }) {
+  // figure out which static PFP to grab based on the user's config
+  const getPFPPath = (cfg) => {
+    if (cfg?.skin === 'pink') {
+      if (cfg.acc === 'cowboy') return '/images/avatarsPFP/pinkCowboyAvatar.png';
+      return '/images/avatarsPFP/pinkAvatar.png';
+    } else if (cfg?.skin === 'green') {
+      if (cfg.acc === 'cowboy') return '/images/avatarsPFP/greenCowboyAvatar.png';
+      return '/images/avatarsPFP/greenAvatar.png';
+    }
+    return '/images/avatarsPFP/baseAvatar.png';
+  };
 
-  // Search states for IMDb API
+  // state for searching movies on IMDb
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
   const [searchError, setSearchError] = useState(null);
   const [hoveredMovieId, setHoveredMovieId] = useState(null);
 
-  // Generate a random ticket number based on the email
+  // generate a fake ticket number using the email so it looks legit
   const ticketNo = user.email
     ? `CV-${Math.abs(user.email.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0))}-X`
     : 'CV-9823-A';
 
-  // Search movies from the keyless IMDb search endpoint
+  // hit the keyless IMDb search endpoint to find movies
   const handleSearch = async (e) => {
     if (e) e.preventDefault();
     if (!searchQuery.trim()) return;
@@ -45,7 +64,7 @@ export default function ProfilePopup({ user, config, setUser, onClose, onEditAva
       } else {
         setSearchResults([]);
       }
-    } catch (err) {
+    } catch {
       setSearchError('Error loading movies. Please try again.');
       setSearchResults([]);
     } finally {
@@ -84,42 +103,13 @@ export default function ProfilePopup({ user, config, setUser, onClose, onEditAva
     }));
   };
 
-  // Resolve model path and retrieve its customizer offsets to dynamically neutralize them
-  let modelPath = '/models/base_avatar.glb';
-  if (config?.skin === 'pink') {
-    if (config.acc === 'cowboy') {
-      modelPath = '/models/cowboy pink.glb';
-    } else {
-      modelPath = '/models/pink.glb';
-    }
-  } else if (config?.skin === 'green') {
-    if (config.acc === 'cowboy') {
-      modelPath = '/models/cowboy green.glb';
-    } else {
-      modelPath = '/models/green.glb';
-    }
-  }
-
-  const activeOffsets = MODEL_OFFSETS[modelPath] || { position: [0, 0, 0], scale: 2.5 };
-  
-  // Set desired world target coordinates for the avatar inside the ticket stub preview
-  // targetX = 0.05 (shifts right inside the ticket's canvas box)
-  // targetY = -0.65 (raises the avatar slightly)
-  // targetZ = 0.25 (brings the avatar closer to the camera)
-  const targetX = 0.03;
-  const targetY = -1.3;
-  const targetZ = 0.55;
-
-  const parentPosX = targetX - (activeOffsets.position[0] ?? 0);
-  const parentPosY = targetY - (activeOffsets.position[1] ?? 0);
-  const parentPosZ = targetZ - (activeOffsets.position[2] ?? 0);
 
   const topMovies = user.topMovies || [];
   const movieSlots = Array.from({ length: 5 }, (_, i) => topMovies[i] || null);
 
   return (
     <div style={overlayStyle}>
-      {/* Scrollbar overrides to color the slider track black and the thumb red */}
+      {/* custom scrollbar overrides to keep that black and red cinema vibe going */}
       <style>{`
         .movie-slider-scrollbar::-webkit-scrollbar {
           height: 6px;
@@ -143,9 +133,9 @@ export default function ProfilePopup({ user, config, setUser, onClose, onEditAva
         transition={{ type: 'spring', damping: 25, stiffness: 200 }}
         style={ticketStyle}
       >
-        {/* Tear-off Ticket Left Stub (Details, Bio, Top Movies) */}
+        {/* left side of the tear-off ticket where all the bio and movies sit */}
         <div style={leftStubStyle}>
-          {/* Header */}
+          {/* ticket header */}
           <div style={ticketHeaderStyle}>
             <div style={logoWrapperStyle}>
               CINE-VERSE IDENTITY PASS
@@ -153,9 +143,9 @@ export default function ProfilePopup({ user, config, setUser, onClose, onEditAva
             <span style={vipBadgeStyle}>VIP ADMIT ONE</span>
           </div>
 
-          {/* Grid Layout for Profile Details and Bio */}
+          {/* grid layout for the profile stats and bio box */}
           <div style={profileGridStyle}>
-            {/* Credentials & Followers */}
+            {/* digital credentials and follower counts */}
             <div style={credentialsColumnStyle}>
               <div style={fieldStyle}>
                 <span style={fieldLabelStyle}>HOLDER NICKNAME</span>
@@ -177,7 +167,7 @@ export default function ProfilePopup({ user, config, setUser, onClose, onEditAva
               </div>
             </div>
 
-            {/* Bio Editor */}
+            {/* bio text area so the user can flex their cinephile identity */}
             <div style={bioColumnStyle}>
               <span style={fieldLabelStyle}>IDENTITY BIO</span>
               <textarea
@@ -190,7 +180,7 @@ export default function ProfilePopup({ user, config, setUser, onClose, onEditAva
             </div>
           </div>
 
-          {/* Top 5 Movies Section */}
+          {/* top 5 movie display section */}
           <div style={moviesSectionStyle}>
             <span style={fieldLabelStyle}>TOP 5 FAVORITE MOVIES</span>
             <div style={movieSlotsContainerStyle}>
@@ -233,7 +223,7 @@ export default function ProfilePopup({ user, config, setUser, onClose, onEditAva
             </div>
           </div>
 
-          {/* IMDb Search Section */}
+          {/* imdb search section to add to the top 5 list */}
           <div style={searchSectionStyle}>
             <form onSubmit={handleSearch} style={searchFormStyle}>
               <input
@@ -283,533 +273,44 @@ export default function ProfilePopup({ user, config, setUser, onClose, onEditAva
             </div>
           </div>
 
-          {/* Barcode representation */}
+          {/* cool barcode representation at the bottom to sell the ticket look */}
           <div style={barcodeContainerStyle}>
             <div style={barcodeLinesStyle} />
             <div style={barcodeNumberStyle}>{ticketNo}</div>
           </div>
         </div>
 
-        {/* Ticket Divider with tear-off circles */}
+        {/* the perforated divider to make it look like a real tear-off ticket */}
         <div style={dividerStyle}>
           <div style={topTearCircleStyle} />
           <div style={dividerLineStyle} />
           <div style={bottomTearCircleStyle} />
         </div>
 
-        {/* Tear-off Ticket Right Stub (3D Viewer) */}
+        {/* right side of the ticket showing the photobooth profile picture */}
         <div style={rightStubStyle}>
-          {/* Close button */}
+          {/* easy close button */}
           <button onClick={onClose} style={closeBtnStyle}>
             X
           </button>
 
-          <div style={viewerLabelStyle}>3D MODEL PREVIEW</div>
+          <div style={viewerLabelStyle}>PROFILE PICTURE</div>
 
-          <div style={canvasContainerStyle}>
-            <Canvas camera={{ position: [0, 0.9, 1.65], fov: 38 }}>
-              <Suspense fallback={null}>
-                <ambientLight intensity={0.8} />
-                <pointLight position={[5, 5, 5]} intensity={1.5} color="#760707" />
-                <pointLight position={[-5, -5, -5]} intensity={0.5} color="#00d4ff" />
-                <group position={[parentPosX, parentPosY, parentPosZ]} rotation={[-0.15, 0, 0]}>
-                  <Avatar config={config} accessories={accessories} isPreview={true} />
-                </group>
-                <OrbitControls
-                  enableZoom={true}
-                  enablePan={false}
-                  minDistance={1.0}
-                  maxDistance={3.5}
-                  maxPolarAngle={Math.PI / 1.8}
-                  minPolarAngle={Math.PI / 3}
-                  minAzimuthAngle={-Math.PI / 4}
-                  maxAzimuthAngle={Math.PI / 4}
+          <div style={{ ...canvasContainerStyle, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+            <div style={photoboothContainerStyle}>
+              <img src="/images/avatarsPFP/film-strip.png" alt="film strip" style={filmStripStyle} />
+              
+              <div style={photoboothFrameStyle}>
+                <img 
+                  src={getPFPPath(config)} 
+                  alt="Avatar Profile" 
+                  style={photoboothImageStyle} 
                 />
-              </Suspense>
-            </Canvas>
+              </div>
+            </div>
           </div>
-
-
-          <div style={dragNoticeStyle}>-- DRAG TO ROTATE --</div>
         </div>
       </motion.div>
     </div>
   );
 }
-
-// ─── Inline CSS Styles ────────────────────────────────────────────────────────
-const overlayStyle = {
-  position: 'fixed',
-  inset: 0,
-  zIndex: 10000,
-  background: 'rgba(0, 0, 0, 0.85)',
-  backdropFilter: 'blur(15px)',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  padding: '20px',
-};
-
-const ticketStyle = {
-  display: 'flex',
-  width: '100%',
-  maxWidth: '920px',
-  height: '580px',
-  background: 'rgba(15, 15, 18, 0.8)',
-  borderRadius: '16px',
-  border: '1px solid rgba(255, 255, 255, 0.08)',
-  boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 40px rgba(118, 7, 7, 0.25)',
-  overflow: 'hidden',
-  position: 'relative',
-};
-
-const leftStubStyle = {
-  flex: '1',
-  padding: '24px',
-  display: 'flex',
-  flexDirection: 'column',
-  justifyContent: 'space-between',
-  boxSizing: 'border-box',
-};
-
-const rightStubStyle = {
-  width: '320px',
-  background: 'rgba(255, 255, 255, 0.01)',
-  borderLeft: '1px dashed rgba(255, 255, 255, 0.08)',
-  padding: '24px 20px',
-  boxSizing: 'border-box',
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  position: 'relative',
-};
-
-const dividerStyle = {
-  position: 'relative',
-  width: '1px',
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-};
-
-const topTearCircleStyle = {
-  position: 'absolute',
-  top: '-15px',
-  left: '-15px',
-  width: '30px',
-  height: '30px',
-  background: 'rgba(0,0,0,1)',
-  borderRadius: '50%',
-  border: '1px solid rgba(255, 255, 255, 0.08)',
-  boxShadow: 'inset 0 0 10px rgba(0,0,0,0.8)',
-  zIndex: 10,
-};
-
-const bottomTearCircleStyle = {
-  position: 'absolute',
-  bottom: '-15px',
-  left: '-15px',
-  width: '30px',
-  height: '30px',
-  background: 'rgba(0,0,0,1)',
-  borderRadius: '50%',
-  border: '1px solid rgba(255, 255, 255, 0.08)',
-  boxShadow: 'inset 0 0 10px rgba(0,0,0,0.8)',
-  zIndex: 10,
-};
-
-const dividerLineStyle = {
-  height: '100%',
-  borderRight: '1px dashed rgba(255, 255, 255, 0.15)',
-};
-
-const ticketHeaderStyle = {
-  display: 'flex',
-  justifyContent: 'space-between',
-  alignItems: 'center',
-  borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
-  paddingBottom: '10px',
-};
-
-const logoWrapperStyle = {
-  color: '#fff',
-  fontFamily: 'monospace',
-  fontSize: '0.85rem',
-  fontWeight: 'bold',
-  letterSpacing: '2px',
-  display: 'flex',
-  alignItems: 'center',
-  gap: '6px',
-};
-
-const vipBadgeStyle = {
-  background: 'rgba(118, 7, 7, 0.15)',
-  border: '1px solid rgba(118, 7, 7, 0.4)',
-  borderRadius: '4px',
-  padding: '4px 10px',
-  color: '#c61a1a',
-  fontSize: '0.65rem',
-  fontWeight: 'bold',
-  letterSpacing: '1px',
-  fontFamily: 'monospace',
-};
-
-const profileGridStyle = {
-  display: 'grid',
-  gridTemplateColumns: '1fr 1fr',
-  gap: '20px',
-  margin: '12px 0',
-};
-
-const credentialsColumnStyle = {
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '10px',
-};
-
-const bioColumnStyle = {
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '6px',
-  textAlign: 'left',
-};
-
-const bioTextareaStyle = {
-  width: '100%',
-  height: '110px',
-  background: 'rgba(0, 0, 0, 0.4)',
-  border: '1px solid rgba(118, 7, 7, 0.4)',
-  borderRadius: '4px',
-  color: '#fff',
-  fontSize: '0.75rem',
-  padding: '10px',
-  boxSizing: 'border-box',
-  resize: 'none',
-  outline: 'none',
-  fontFamily: 'monospace',
-  lineHeight: '1.4',
-  letterSpacing: '0.5px',
-};
-
-const fieldStyle = {
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '2px',
-  textAlign: 'left',
-};
-
-const fieldLabelStyle = {
-  color: '#555',
-  fontSize: '0.6rem',
-  fontWeight: 'bold',
-  letterSpacing: '1.5px',
-  fontFamily: 'monospace',
-};
-
-const fieldValueStyle = {
-  color: '#fff',
-  fontSize: '0.9rem',
-  fontWeight: 'bold',
-  letterSpacing: '1.5px',
-  fontFamily: 'monospace',
-};
-
-const moviesSectionStyle = {
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '6px',
-  textAlign: 'left',
-};
-
-const movieSlotsContainerStyle = {
-  display: 'flex',
-  gap: '10px',
-  margin: '4px 0',
-};
-
-const movieCardStyle = {
-  position: 'relative',
-  width: '72px',
-  height: '108px',
-  borderRadius: '6px',
-  overflow: 'hidden',
-  border: '1px solid rgba(255, 255, 255, 0.1)',
-  background: 'rgba(0, 0, 0, 0.5)',
-  cursor: 'pointer',
-  boxSizing: 'border-box',
-};
-
-const emptyMovieCardStyle = {
-  width: '72px',
-  height: '108px',
-  borderRadius: '6px',
-  border: '1px dashed rgba(118, 7, 7, 0.4)',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  background: 'rgba(0, 0, 0, 0.2)',
-  boxSizing: 'border-box',
-};
-
-const emptyCardNumberStyle = {
-  fontFamily: 'monospace',
-  fontSize: '0.9rem',
-  color: '#333',
-  fontWeight: 'bold',
-};
-
-const moviePosterStyle = {
-  width: '100%',
-  height: '100%',
-  objectFit: 'cover',
-};
-
-const moviePosterFallbackStyle = {
-  width: '100%',
-  height: '100%',
-  background: 'linear-gradient(135deg, #1f1f2e 0%, #11111a 100%)',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  padding: '6px',
-  boxSizing: 'border-box',
-};
-
-const movieFallbackTitleStyle = {
-  fontFamily: 'monospace',
-  fontSize: '0.55rem',
-  color: '#aaa',
-  textAlign: 'center',
-  lineHeight: '1.2',
-};
-
-const movieRemoveOverlayStyle = {
-  position: 'absolute',
-  inset: 0,
-  background: 'rgba(118, 7, 7, 0.95)',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  transition: 'opacity 0.2s ease',
-};
-
-const removeBtnTextStyle = {
-  color: '#fff',
-  fontSize: '0.65rem',
-  fontWeight: 'bold',
-  fontFamily: 'monospace',
-  letterSpacing: '1px',
-};
-
-const searchSectionStyle = {
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '6px',
-  marginTop: '10px',
-};
-
-const searchFormStyle = {
-  display: 'flex',
-  gap: '8px',
-};
-
-const movieSearchInputStyle = {
-  flex: '1',
-  background: 'rgba(0, 0, 0, 0.6)',
-  border: '1px solid rgba(255, 255, 255, 0.1)',
-  borderRadius: '4px',
-  padding: '8px 12px',
-  color: '#fff',
-  fontSize: '0.75rem',
-  fontFamily: 'monospace',
-  outline: 'none',
-  letterSpacing: '0.5px',
-};
-
-const movieSearchBtnStyle = {
-  background: '#760707',
-  border: 'none',
-  borderRadius: '4px',
-  color: '#fff',
-  padding: '8px 16px',
-  fontFamily: 'monospace',
-  fontWeight: 'bold',
-  fontSize: '0.75rem',
-  letterSpacing: '1px',
-  cursor: 'pointer',
-};
-
-const searchErrorStyle = {
-  color: '#ff4b4b',
-  fontSize: '0.7rem',
-  fontFamily: 'monospace',
-  textAlign: 'left',
-};
-
-const searchResultsContainerStyle = {
-  display: 'flex',
-  gap: '10px',
-  overflowX: 'auto',
-  paddingBottom: '8px',
-  minHeight: '80px',
-  maxHeight: '90px',
-  alignItems: 'center',
-  width: '100%',
-  maxWidth: '520px',
-  boxSizing: 'border-box',
-};
-
-const searchResultItemStyle = {
-  flex: '0 0 160px',
-  height: '74px',
-  background: 'rgba(255, 255, 255, 0.03)',
-  border: '1px solid rgba(255, 255, 255, 0.06)',
-  borderRadius: '4px',
-  display: 'flex',
-  gap: '8px',
-  padding: '4px',
-  boxSizing: 'border-box',
-  textAlign: 'left',
-};
-
-const searchResultPosterStyle = {
-  width: '42px',
-  height: '100%',
-  objectFit: 'cover',
-  borderRadius: '2px',
-};
-
-const searchResultPosterFallbackStyle = {
-  width: '42px',
-  height: '100%',
-  background: '#1a1a24',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  fontSize: '0.7rem',
-  color: '#555',
-  fontFamily: 'monospace',
-  borderRadius: '2px',
-};
-
-const searchResultDetailsStyle = {
-  display: 'flex',
-  flexDirection: 'column',
-  justifyContent: 'space-between',
-  flex: '1',
-  overflow: 'hidden',
-};
-
-const searchResultTitleStyle = {
-  color: '#fff',
-  fontSize: '0.6rem',
-  fontWeight: 'bold',
-  fontFamily: 'monospace',
-  whiteSpace: 'nowrap',
-  overflow: 'hidden',
-  textOverflow: 'ellipsis',
-};
-
-const addMovieBtnStyle = {
-  background: 'rgba(118, 7, 7, 0.2)',
-  border: '1px solid rgba(118, 7, 7, 0.5)',
-  borderRadius: '2px',
-  color: '#c61a1a',
-  fontSize: '0.55rem',
-  padding: '2px 6px',
-  fontFamily: 'monospace',
-  fontWeight: 'bold',
-  cursor: 'pointer',
-  textAlign: 'center',
-  width: 'fit-content',
-};
-
-const noResultsStyle = {
-  color: '#444',
-  fontSize: '0.7rem',
-  fontFamily: 'monospace',
-  width: '100%',
-  textAlign: 'center',
-};
-
-const barcodeContainerStyle = {
-  borderTop: '1px solid rgba(255, 255, 255, 0.05)',
-  paddingTop: '10px',
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  gap: '4px',
-};
-
-const barcodeLinesStyle = {
-  width: '100%',
-  height: '30px',
-  backgroundImage: 'repeating-linear-gradient(90deg, #fff, #fff 1px, transparent 1px, transparent 6px, #fff 6px, #fff 8px, transparent 8px, transparent 12px, #fff 12px, #fff 13px, transparent 13px, transparent 18px, #fff 18px, #fff 22px, transparent 22px, transparent 24px)',
-  opacity: 0.6,
-};
-
-const barcodeNumberStyle = {
-  color: '#444',
-  fontSize: '0.55rem',
-  letterSpacing: '4px',
-  fontFamily: 'monospace',
-};
-
-const closeBtnStyle = {
-  position: 'absolute',
-  top: '15px',
-  right: '15px',
-  zIndex: 100,
-  background: 'none',
-  border: 'none',
-  color: '#666',
-  fontSize: '1.1rem',
-  cursor: 'pointer',
-  transition: 'color 0.2s',
-  padding: '5px',
-};
-
-const viewerLabelStyle = {
-  color: '#555',
-  fontSize: '0.6rem',
-  fontWeight: 'bold',
-  letterSpacing: '2px',
-  fontFamily: 'monospace',
-  marginBottom: '10px',
-};
-
-const canvasContainerStyle = {
-  width: '100%',
-  height: '420px',
-  background: 'radial-gradient(circle, rgba(118, 7, 7, 0.12) 0%, transparent 80%)',
-  borderRadius: '8px',
-  border: '1px solid rgba(255, 255, 255, 0.02)',
-  overflow: 'hidden',
-};
-
-const dragNoticeStyle = {
-  color: '#444',
-  fontSize: '0.55rem',
-  letterSpacing: '2px',
-  fontFamily: 'monospace',
-  marginTop: '10px',
-};
-
-const editAvatarBtnStyle = {
-  width: '100%',
-  padding: '10px',
-  background: 'transparent',
-  border: '1px solid rgba(118, 7, 7, 0.5)',
-  borderRadius: '4px',
-  color: '#c61a1a',
-  fontWeight: 'bold',
-  fontFamily: 'monospace',
-  fontSize: '0.75rem',
-  letterSpacing: '1.5px',
-  cursor: 'pointer',
-  transition: 'all 0.3s ease',
-  marginTop: '10px',
-  boxSizing: 'border-box',
-};

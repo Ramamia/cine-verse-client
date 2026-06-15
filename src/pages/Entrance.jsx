@@ -1,6 +1,20 @@
 import React, { useMemo } from 'react';
 import { useGLTF, Float, OrbitControls } from '@react-three/drei';
 
+const SeatRow = ({ x, z, startIdx, rotationY, seatClones }) => (
+  <group position={[x, 1, z]}>
+    {[0, 1, 2, 3].map((i) => (
+      <primitive
+        key={`seat-${startIdx + i}`}
+        object={seatClones[startIdx + i]}
+        position={[0, 0, i * -1.8]}
+        rotation={[0, rotationY, 0]}
+        scale={0.006}
+      />
+    ))}
+  </group>
+);
+
 export default function Entrance() {
   const { scene: booth } = useGLTF('/models/ticket_booth.glb');
   const { scene: seat  } = useGLTF('/models/cinema_chair..glb');
@@ -9,19 +23,7 @@ export default function Entrance() {
   const seatClones = useMemo(() => Array.from({ length: 32 }, () => seat.clone()), [seat]);
   const ropeClones = useMemo(() => Array.from({ length: 6  }, () => rope.clone()), [rope]);
 
-  const SeatRow = ({ x, z, startIdx, rotationY }) => (
-    <group position={[x, 1, z]}>
-      {[0, 1, 2, 3].map((i) => (
-        <primitive
-          key={`seat-${startIdx + i}`}
-          object={seatClones[startIdx + i]}
-          position={[0, 0, i * -1.8]}
-          rotation={[0, rotationY, 0]}
-          scale={0.006}
-        />
-      ))}
-    </group>
-  );
+
 
   return (
     <group>
@@ -43,14 +45,14 @@ export default function Entrance() {
       </Float>
 
       {/* Left seat rows */}
-      <SeatRow x={-6}  z={10} startIdx={0}  rotationY={Math.PI} />
-      <SeatRow x={-9}  z={10} startIdx={4}  rotationY={Math.PI} />
-      <SeatRow x={-12} z={10} startIdx={8}  rotationY={Math.PI} />
+      <SeatRow x={-6}  z={10} startIdx={0}  rotationY={Math.PI} seatClones={seatClones} />
+      <SeatRow x={-9}  z={10} startIdx={4}  rotationY={Math.PI} seatClones={seatClones} />
+      <SeatRow x={-12} z={10} startIdx={8}  rotationY={Math.PI} seatClones={seatClones} />
 
       {/* Right seat rows */}
-      <SeatRow x={6}   z={10} startIdx={12} rotationY={Math.PI} />
-      <SeatRow x={9}   z={10} startIdx={16} rotationY={Math.PI} />
-      <SeatRow x={12}  z={10} startIdx={20} rotationY={Math.PI} />
+      <SeatRow x={6}   z={10} startIdx={12} rotationY={Math.PI} seatClones={seatClones} />
+      <SeatRow x={9}   z={10} startIdx={16} rotationY={Math.PI} seatClones={seatClones} />
+      <SeatRow x={12}  z={10} startIdx={20} rotationY={Math.PI} seatClones={seatClones} />
 
       {/* Velvet ropes */}
       {[

@@ -60,7 +60,7 @@ export default function LoadingScreen({ genre }) {
   return (
     <div
       style={{
-        position: 'fixed', inset: 0, zIndex: 9999,
+        position: 'fixed', inset: 0, zIndex: 9999999,
         backgroundImage: `url(${current.bgImage})`,
         backgroundSize: 'cover', backgroundPosition: 'center',
         display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',

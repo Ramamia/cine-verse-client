@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   panelStyle, tabContainer, tabBtn, contentBody, label,
@@ -62,7 +63,7 @@ const CustomizePanel = ({ config, setConfig, user, setUser, onFinish }) => {
 
   const handleConfirm = () => {
     if (!user || !user.nickname || !user.nickname.trim()) {
-      alert('Please choose a nickname before confirming your identity.');
+      window.dispatchEvent(new CustomEvent('show-alert', { detail: 'PLEASE CHOOSE A NICKNAME BEFORE CONFIRMING YOUR IDENTITY.' }));
       return;
     }
     onFinish();

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+// eslint-disable-next-line no-unused-vars
 import { motion } from 'framer-motion';
 import {
   authOverlay, authGlassPanel, authToggleContainer, authSwitchBtn,
@@ -11,17 +12,34 @@ const AuthModal = ({ onLogin }) => {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [errorMsg, setErrorMsg] = useState('');
 
   const handleSubmit = () => {
+    setErrorMsg('');
+    
     if (!email || !password) {
-      alert('Please fill in all credentials.');
+      setErrorMsg('PLEASE FILL IN ALL CREDENTIALS.');
       return;
     }
-    // Simple email validation regex
-    if (!/\S+@\S+\.\S+/.test(email)) {
-      alert('Please enter a valid email address.');
+    
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setErrorMsg('INVALID EMAIL FORMAT DETECTED.');
       return;
     }
+
+    if (!isLogin) {
+      // Frontend security for signup
+      if (password.length < 8) {
+        setErrorMsg('PASSWORD MUST BE AT LEAST 8 CHARACTERS.');
+        return;
+      }
+      if (!/[A-Z]/.test(password) || !/[0-9]/.test(password)) {
+        setErrorMsg('PASSWORD MUST CONTAIN AT LEAST ONE UPPERCASE LETTER AND ONE NUMBER.');
+        return;
+      }
+    }
+
     onLogin({ email, password, isLogin });
   };
 
@@ -60,6 +78,24 @@ const AuthModal = ({ onLogin }) => {
               : "The curtains are rising. Let's start your journey."}
           </p>
         </div>
+
+        {/* Error Message */}
+        {errorMsg && (
+          <div style={{
+            color: '#ff4b4b',
+            background: 'rgba(118, 7, 7, 0.2)',
+            border: '1px solid #760707',
+            padding: '10px',
+            marginBottom: '15px',
+            borderRadius: '4px',
+            fontFamily: 'monospace',
+            fontSize: '11px',
+            letterSpacing: '1px',
+            textAlign: 'center'
+          }}>
+            ⚠️ {errorMsg}
+          </div>
+        )}
 
         {/* Fields */}
         <div style={{ width: '100%' }}>
