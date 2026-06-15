@@ -1,6 +1,8 @@
 import React, { useState, Suspense, useEffect } from 'react';
 import { Canvas, useFrame} from '@react-three/fiber';
 import { Loader, MeshReflectorMaterial, Environment, OrbitControls } from '@react-three/drei';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useAppContext } from './contexts/AppContext';
 
 // our big full-screen scenes
 import Entrance        from './pages/Entrance';
@@ -42,10 +44,10 @@ function EntranceCamera() {
       state.camera.position.set(2, 7, 7); // start zoomed-in closer
       initialized.current = true;
     }
-    // smoothly pull the camera back
+    // smoothly pull the camera back further to zoom out
     state.camera.position.x += (2 - state.camera.position.x) * 0.025;
-    state.camera.position.y += (7 - state.camera.position.y) * 0.025;
-    state.camera.position.z += (13 - state.camera.position.z) * 0.025;
+    state.camera.position.y += (8 - state.camera.position.y) * 0.025;
+    state.camera.position.z += (20 - state.camera.position.z) * 0.025;
   });
   return null;
 }
@@ -53,39 +55,38 @@ function EntranceCamera() {
 
 // main app component where everything starts
 function App() {
-  const [step,          setStep]          = useState('entrance');
-  const [activeGenre,   setActiveGenre]   = useState(null);
-  const [isLoading,     setIsLoading]     = useState(false);
-  const [searchError,   setSearchError]   = useState(null);
-  const [globalAlert,   setGlobalAlert]   = useState(null);
-  const [config,        setConfig]        = useState({ acc: null, hair: null, skin: '#ffdbac' });
-  const [user,          setUser]          = useState({
-    nickname: '',
-    email: '',
-    bio: '',
-    topMovies: [],
-    following: [],
-  });
-  const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [selectedMovie, setSelectedMovie] = useState(null);
-  const [feedItems,     setFeedItems]     = useState([
-    { user: 'Lara',  rating: '★ 4',   comment: '"The twist in Scream 6 blew my mind!"' },
-    { user: 'Fahed', rating: '★ 2.9', comment: '"I can\'t believe the ending of that movie it sucks"' },
-    { user: 'Lilia', rating: '★ 4.5', comment: '"minecraft movie was AMAZINGG"' },
-  ]);
+  const location = useLocation();
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    const handleAlert = (e) => setGlobalAlert(e.detail);
-    window.addEventListener('show-alert', handleAlert);
-    return () => window.removeEventListener('show-alert', handleAlert);
-  }, []);
+  const {
+    isLoading, setIsLoading,
+    searchError, setSearchError,
+    globalAlert, setGlobalAlert,
+    isProfileOpen, setIsProfileOpen,
+    selectedMovie, setSelectedMovie,
+    config, setConfig,
+    user, setUser,
+    feedItems, setFeedItems,
+  } = useAppContext();
+
+  // Derive current view from the URL
+  const path = location.pathname;
+  let step = 'entrance';
+  let activeGenre = null;
+
+  if (path === '/') step = 'entrance';
+  else if (path === '/customize') step = 'customize';
+  else if (path === '/hub') step = 'hub';
+  else if (path.startsWith('/vault/')) {
+    step = 'genrePage';
+    activeGenre = path.split('/')[2]; // e.g., 'horror'
+  }
 
   const enterGenrePortal = (genreId) => {
     setIsLoading(true);
-    setActiveGenre(genreId);
     setTimeout(() => {
       setIsLoading(false);
-      setStep('genrePage');
+      navigate(`/vault/${genreId}`);
     }, 2500); // keep the loading screen snappy
   };
 
@@ -154,7 +155,7 @@ function App() {
           <Header />
           <AuthModal onLogin={({ email }) => {
             setUser(prev => ({ ...prev, email }));
-            setStep('customize');
+            navigate('/customize');
           }} />
         </>
       )}
@@ -169,7 +170,7 @@ function App() {
             setConfig={setConfig} 
             user={user} 
             setUser={setUser} 
-            onFinish={() => setStep('hub')} 
+            onFinish={() => navigate('/hub')} 
           />
         </>
       )}
@@ -232,7 +233,7 @@ function App() {
           />
           
           <div style={genreUI}>
-            <button onClick={() => setStep('hub')} style={backBtn}>← BACK TO ROTUNDA</button>
+            <button onClick={() => navigate('/hub')} style={backBtn}>← BACK TO ROTUNDA</button>
             <h1 style={genreTitle}>{activeGenre?.toUpperCase()} VAULT</h1>
           </div>
 
@@ -345,7 +346,7 @@ function App() {
           onClose={() => setIsProfileOpen(false)} 
           onEditAvatar={() => {
             setIsProfileOpen(false);
-            setStep('customize');
+            navigate('/customize');
           }}
         />
       )}

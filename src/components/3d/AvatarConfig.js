@@ -15,7 +15,7 @@ export const MODEL_OFFSETS = {
     rotation: [0, 0, 0]
   },
   '/models/cowboy pink.glb': {
-    position:[-6.54, 0.32, -0.5],
+    position: [-6.54, 0.32, -0.5],
     scale: 0.5,
     rotation: [0, 0, 0]
   },

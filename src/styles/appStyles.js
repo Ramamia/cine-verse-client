@@ -17,7 +17,7 @@ export const globalAlertOverlayStyle = {
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
-  zIndex: 9999
+  zIndex: 20000
 };
 
 export const globalAlertBoxStyle = {

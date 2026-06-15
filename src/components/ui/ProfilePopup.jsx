@@ -16,8 +16,10 @@ import {
   viewerLabelStyle, canvasContainerStyle, photoboothFrameStyle, photoboothImageStyle,
   photoboothContainerStyle, filmStripStyle
 } from '../../styles/profilePopupStyles';
+import { useAppContext } from '../../contexts/AppContext';
 
 export default function ProfilePopup({ user, config, setUser, onClose }) {
+  const { setGlobalAlert } = useAppContext();
   // figure out which static PFP to grab based on the user's config
   const getPFPPath = (cfg) => {
     if (cfg?.skin === 'pink') {
@@ -75,11 +77,11 @@ export default function ProfilePopup({ user, config, setUser, onClose }) {
   const handleAddMovie = (movie) => {
     const currentMovies = user.topMovies || [];
     if (currentMovies.length >= 5) {
-      alert('You can only select up to 5 top movies.');
+      setGlobalAlert('YOU CAN ONLY SELECT UP TO 5 TOP MOVIES.');
       return;
     }
     if (currentMovies.some(m => m.id === movie.id)) {
-      alert('This movie is already in your Top 5.');
+      setGlobalAlert('THIS MOVIE IS ALREADY IN YOUR TOP 5.');
       return;
     }
     setUser(prev => ({
