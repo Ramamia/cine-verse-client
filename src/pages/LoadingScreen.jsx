@@ -10,7 +10,7 @@ const LOADING_DATA = {
     scale: 2.3,
     position: [0, 0, 0],
     rotation: [0, 0, 0],
-    bgImage: '/images/loadingBackgounds/romcom_bg.png',
+    bgImage: '/images/loadingBackgrounds/romcom_bg.png',
     accent: '#ff69b4',
   },
   horror: {
@@ -19,7 +19,7 @@ const LOADING_DATA = {
     scale: 4,
     position: [0, -0.9, 1],
     rotation: [0, 0, 0.2],
-    bgImage: '/images/loadingBackgounds/horror_bg.png',
+    bgImage: '/images/loadingBackgrounds/horror_bg.png',
     accent: '#433636',
   },
   scifi: {
@@ -28,7 +28,7 @@ const LOADING_DATA = {
     scale: 0.014,
     position: [0, -2, 1],
     rotation: [0, Math.PI, 0.5],
-    bgImage: '/images/loadingBackgounds/scifi_bg.png',
+    bgImage: '/images/loadingBackgrounds/scifi_bg.png',
     accent: '#00d4ff',
   },
 };
@@ -112,7 +112,7 @@ export default function LoadingScreen({ genre }) {
         }}>
           <div style={{
             height: '100%', background: current.accent, width: '100%',
-            animation: 'loadingBar 10s linear forwards',
+            animation: 'loadingBar 2.5s linear forwards',
             boxShadow: `0 0 10px ${current.accent}`,
           }} />
         </div>

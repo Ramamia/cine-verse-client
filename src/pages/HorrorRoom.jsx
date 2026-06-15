@@ -13,7 +13,7 @@ export const MOVIES = [
     year: '1990',
     director: 'Adrian Lyne',
     actors: 'Tim Robbins, Elizabeth Peña, Danny Aiello, Matt Craven',
-    poster: '/images/jacobs_ladder.png',
+    poster: '/images/horrorMovies/jacobs_ladder.png',
     side: 'left',
     z: 10
   },
@@ -25,7 +25,7 @@ export const MOVIES = [
     year: '1990',
     director: 'Tommy Lee Wallace',
     actors: 'Tim Curry, Harry Anderson, Dennis Christopher, Richard Masur',
-    poster: '/images/it.png',
+    poster: '/images/horrorMovies/it.png',
     side: 'right',
     z: 10
   },
@@ -37,7 +37,7 @@ export const MOVIES = [
     year: '1990',
     director: 'William Peter Blatty',
     actors: 'George C. Scott, Ed Flanders, Brad Dourif, Jason Miller',
-    poster: '/images/exorcist_3.png',
+    poster: '/images/horrorMovies/exorcist_3.png',
     side: 'left',
     z: 3
   },
@@ -49,7 +49,7 @@ export const MOVIES = [
     year: '2011',
     director: 'Drew Goddard',
     actors: 'Kristen Connolly, Fran Kranz, Chris Hemsworth, Jesse Williams',
-    poster: '/images/cabin_in_the_woods.png',
+    poster: '/images/horrorMovies/cabin_in_the_woods.png',
     side: 'right',
     z: 3
   },
@@ -61,7 +61,7 @@ export const MOVIES = [
     year: '2017',
     director: 'Darren Aronofsky',
     actors: 'Jennifer Lawrence, Javier Bardem, Ed Harris, Michelle Pfeiffer',
-    poster: '/images/mother.png',
+    poster: '/images/horrorMovies/mother.png',
     side: 'left',
     z: -4
   },
@@ -73,7 +73,7 @@ export const MOVIES = [
     year: '2016',
     director: 'Damien Leone',
     actors: 'David Howard Thornton, Jenna Kanell, Samantha Scaffidi, Catherine Corcoran',
-    poster: '/images/terrifier.png',
+    poster: '/images/horrorMovies/terrifier.png',
     side: 'right',
     z: -4
   },
@@ -85,7 +85,7 @@ export const MOVIES = [
     year: '2017',
     director: 'Jordan Peele',
     actors: 'Daniel Kaluuya, Allison Williams, Catherine Keener, Bradley Whitford',
-    poster: '/images/get_out.png',
+    poster: '/images/horrorMovies/get_out.png',
     side: 'left',
     z: -11
   },
@@ -97,7 +97,7 @@ export const MOVIES = [
     year: '2004',
     director: 'James Wan',
     actors: 'Tobin Bell, Cary Elwes, Leigh Whannell, Danny Glover',
-    poster: '/images/saw.png',
+    poster: '/images/horrorMovies/saw.png',
     side: 'right',
     z: -11
   },
@@ -109,7 +109,7 @@ export const MOVIES = [
     year: '2008',
     director: 'James Watkins',
     actors: 'Kelly Reilly, Michael Fassbender, Jack O\'Connell, Finn Atkins',
-    poster: '/images/eden_lake.png',
+    poster: '/images/horrorMovies/eden_lake.png',
     side: 'left',
     z: -18
   },
@@ -121,7 +121,7 @@ export const MOVIES = [
     year: '2018',
     director: 'Ari Aster',
     actors: 'Toni Collette, Alex Wolff, Gabriel Byrne, Milly Shapiro',
-    poster: '/images/hereditary.png',
+    poster: '/images/horrorMovies/hereditary.png',
     side: 'right',
     z: -18
   },
@@ -133,7 +133,7 @@ export const MOVIES = [
     year: '2009',
     director: 'Jaume Collet-Serra',
     actors: 'Vera Farmiga, Peter Sarsgaard, Isabelle Fuhrman, CCH Pounder',
-    poster: '/images/orphan.png',
+    poster: '/images/horrorMovies/orphan.png',
     side: 'left',
     z: -25
   },
@@ -145,7 +145,7 @@ export const MOVIES = [
     year: '2016',
     director: 'Mike Flanagan',
     actors: 'Kate Siegel, John Gallagher Jr., Michael Trucco, Samantha Sloyan',
-    poster: '/images/hush.png',
+    poster: '/images/horrorMovies/hush.png',
     side: 'right',
     z: -25
   }
@@ -318,15 +318,15 @@ export default function HorrorRoom({ onSelectMovie }) {
         <meshStandardMaterial color="#1a0a0a" roughness={0.9} />
       </mesh>
 
-      {/* End Wall Mesh (Dark end of the corridor) */}
-      <mesh position={[0, 1.8, -30.5]} rotation={[0, 0, 0]}>
+      {/* End Wall */}
+      <mesh position={[0, 1.8, -33.75]} rotation={[0, 0, 0]}>
         <planeGeometry args={[10, 6]} />
-        <meshStandardMaterial color="#1a0a0a" roughness={1.0} />
+        <meshStandardMaterial color="#050000" roughness={1.0} />
       </mesh>
 
-      {/* Scary End Sign — only visible when very close */}
+      {/* The End Sign - Only shows up when very close */}
       {showEndSign && (
-        <Html position={[0, 2.0, -30.4]} center transform zIndexRange={[0, 0]}>
+        <Html position={[0, 2.0, -33.65]} center transform zIndexRange={[0, 0]}>
           <div style={{
             textAlign: 'center',
             color: '#ff1a1a',
@@ -335,19 +335,17 @@ export default function HorrorRoom({ onSelectMovie }) {
             userSelect: 'none',
             pointerEvents: 'none',
           }}>
-            <h1 style={{ fontSize: '32px', margin: '0 0 10px 0', letterSpacing: '8px', fontWeight: 'bold' }}>THE END</h1>
+            <h1 style={{ fontSize: '40px', margin: '0 0 10px 0', letterSpacing: '8px' }}>DEAD END</h1>
             <p style={{
-              fontSize: '11px',
-              color: '#888',
+              fontSize: '14px',
+              color: '#ff4b4b',
               fontFamily: 'monospace',
               letterSpacing: '2px',
               margin: 0,
-              fontStyle: 'italic',
-              maxWidth: '300px',
-              textTransform: 'uppercase',
-              lineHeight: '1.4'
+              fontStyle: 'italic'
             }}>
-              That's all for the horror movies... for now...
+              You've gone too far. They are waiting for you in the dark.<br />
+              Don't look behind you.
             </p>
           </div>
         </Html>

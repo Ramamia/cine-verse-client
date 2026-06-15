@@ -66,16 +66,18 @@ export default function MovieDetailPopup({ movie, user, setUser, onClose, onAddR
   };
   // ── Theme Colors based on genre ──
   const isRomcom = genre === 'romcom';
-  const themeAccent = isRomcom ? '#ff69b4' : '#760707';
-  const themeAccentLight = isRomcom ? '#ffb6d9' : '#ff4b4b';
-  const themeAccentRgba = isRomcom ? 'rgba(255, 105, 180, 0.5)' : 'rgba(118, 7, 7, 0.5)';
-  const themeAccentRgbaLight = isRomcom ? 'rgba(255, 105, 180, 0.15)' : 'rgba(118, 7, 7, 0.15)';
-  const themeAccentRgbaDivider = isRomcom ? 'rgba(255, 105, 180, 0.2)' : 'rgba(118, 7, 7, 0.2)';
-  const themeShadow = isRomcom ? 'rgba(255, 105, 180, 0.3)' : 'rgba(118, 7, 7, 0.3)';
-  const themeCardBg = isRomcom ? 'rgba(30, 15, 25, 0.95)' : 'rgba(12, 10, 10, 0.95)';
-  const themePosterBg = isRomcom ? '#1a0a14' : '#000';
-  const badgeLabel = isRomcom ? 'ROMCOM LOUNGE' : 'HORROR VAULT';
-  const themeInputBorder = isRomcom ? 'rgba(255, 105, 180, 0.4)' : 'rgba(118, 7, 7, 0.4)';
+  const isScifi = genre === 'scifi';
+
+  const themeAccent = isScifi ? '#00ff41' : (isRomcom ? '#ff69b4' : '#760707');
+  const themeAccentLight = isScifi ? '#00cc33' : (isRomcom ? '#ffb6d9' : '#ff4b4b');
+  const themeAccentRgba = isScifi ? 'rgba(0, 255, 65, 0.5)' : (isRomcom ? 'rgba(255, 105, 180, 0.5)' : 'rgba(118, 7, 7, 0.5)');
+  const themeAccentRgbaLight = isScifi ? 'rgba(0, 255, 65, 0.15)' : (isRomcom ? 'rgba(255, 105, 180, 0.15)' : 'rgba(118, 7, 7, 0.15)');
+  const themeAccentRgbaDivider = isScifi ? 'rgba(0, 255, 65, 0.2)' : (isRomcom ? 'rgba(255, 105, 180, 0.2)' : 'rgba(118, 7, 7, 0.2)');
+  const themeShadow = isScifi ? 'rgba(0, 255, 65, 0.3)' : (isRomcom ? 'rgba(255, 105, 180, 0.3)' : 'rgba(118, 7, 7, 0.3)');
+  const themeCardBg = isScifi ? 'rgba(2, 5, 19, 0.95)' : (isRomcom ? 'rgba(30, 15, 25, 0.95)' : 'rgba(12, 10, 10, 0.95)');
+  const themePosterBg = isScifi ? '#01030a' : (isRomcom ? '#1a0a14' : '#000');
+  const badgeLabel = isScifi ? 'SCI-FI TERMINAL' : (isRomcom ? 'ROMCOM LOUNGE' : 'HORROR VAULT');
+  const themeInputBorder = isScifi ? 'rgba(0, 255, 65, 0.4)' : (isRomcom ? 'rgba(255, 105, 180, 0.4)' : 'rgba(118, 7, 7, 0.4)');
 
   return (
     <div style={overlayStyle}>
@@ -113,7 +115,7 @@ export default function MovieDetailPopup({ movie, user, setUser, onClose, onAddR
             }}>{badgeLabel}</div>
             <h2 style={{
               ...titleStyle,
-              textShadow: `0 0 10px ${isRomcom ? 'rgba(255, 105, 180, 0.4)' : 'rgba(118, 7, 7, 0.4)'}`,
+              textShadow: `0 0 10px ${isScifi ? 'rgba(0, 255, 65, 0.4)' : (isRomcom ? 'rgba(255, 105, 180, 0.4)' : 'rgba(118, 7, 7, 0.4)')}`,
             }}>{movie.title.toUpperCase()}</h2>
             <p style={sloganStyle}>"{movie.slogan.toUpperCase()}"</p>
           </div>
@@ -195,7 +197,7 @@ export default function MovieDetailPopup({ movie, user, setUser, onClose, onAddR
                         onClick={() => setRating(star)}
                         style={{
                           ...starStyle,
-                          color: star <= rating ? (isRomcom ? '#ff69b4' : '#ffd700') : '#444'
+                          color: star <= rating ? (isScifi ? '#ffd700' : (isRomcom ? '#ff69b4' : '#ffd700')) : '#444'
                         }}
                       >
                         ★

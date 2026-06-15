@@ -103,12 +103,12 @@ export default function ProfilePopup({ user, config, setUser, onClose, onEditAva
   const activeOffsets = MODEL_OFFSETS[modelPath] || { position: [0, 0, 0], scale: 2.5 };
   
   // Set desired world target coordinates for the avatar inside the ticket stub preview
-  // targetX = 0.5 (shifts right inside the ticket's canvas box)
-  // targetY = -0.8 (aligns the upper body nicely to the camera)
-  // targetZ = 0 (centers along depth)
-  const targetX = 0.5;
-  const targetY = -0.8;
-  const targetZ = 0;
+  // targetX = 0.0 (shifts left inside the ticket's canvas box)
+  // targetY = -0.7 (raises the avatar slightly)
+  // targetZ = 0.2 (brings the avatar closer to the camera)
+  const targetX = 0.0;
+  const targetY = -0.7;
+  const targetZ = 0.2;
 
   const parentPosX = targetX - (activeOffsets.position[0] ?? 0);
   const parentPosY = targetY - (activeOffsets.position[1] ?? 0);
@@ -322,6 +322,8 @@ export default function ProfilePopup({ user, config, setUser, onClose, onEditAva
                   maxDistance={3.5}
                   maxPolarAngle={Math.PI / 1.8}
                   minPolarAngle={Math.PI / 3}
+                  minAzimuthAngle={-Math.PI / 4}
+                  maxAzimuthAngle={Math.PI / 4}
                 />
               </Suspense>
             </Canvas>

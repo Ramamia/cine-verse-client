@@ -13,4 +13,5 @@ export const roomSettings = {
   hub:       { bg: '#1f1919', fogNear: 10, fogFar: 40, camPos: [0, 5, 12] },
   genrePage:  { bg: '#0f0505', fogNear: 8,  fogFar: 55, camPos: [0, 2, 12.5] },
   romcomPage: { bg: '#fff0f5', fogNear: 8,  fogFar: 55, camPos: [0, 2, 12.5] },
+  scifiPage:  { bg: '#0a1730', fogNear: 8,  fogFar: 55, camPos: [0, 2, 12.5] },
 };

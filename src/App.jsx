@@ -8,6 +8,7 @@ import GrandRotunda    from './pages/GrandRotunda';
 import CharacterCreator from './pages/CharacterCreator';
 import HorrorRoom      from './pages/HorrorRoom';
 import RomComRoom      from './pages/RomComRoom';
+import ScifiRoom       from './pages/ScifiRoom';
 import LoadingScreen   from './pages/LoadingScreen';
 
 // UI components
@@ -88,7 +89,7 @@ function App() {
   const handleSearch = (val) => console.log('Searching TMDB for:', val);
 
   const currentSettings = step === 'genrePage' 
-    ? (activeGenre === 'romcom' ? roomSettings.romcomPage : roomSettings.genrePage)
+    ? (activeGenre === 'romcom' ? roomSettings.romcomPage : activeGenre === 'scifi' ? roomSettings.scifiPage : roomSettings.genrePage)
     : (roomSettings[step] ?? roomSettings.hub);
 
   return (
@@ -287,6 +288,9 @@ function App() {
           )}
           {step === 'genrePage' && activeGenre === 'romcom' && (
             <RomComRoom onSelectMovie={setSelectedMovie} />
+          )}
+          {step === 'genrePage' && activeGenre === 'scifi' && (
+            <ScifiRoom onSelectMovie={setSelectedMovie} />
           )}
 
           {/* Reflective floor */}

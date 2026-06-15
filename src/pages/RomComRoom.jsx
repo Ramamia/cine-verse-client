@@ -271,15 +271,15 @@ export default function RomComRoom({ onSelectMovie }) {
     if (forward)  camera.position.z -= speed * delta;
     if (backward) camera.position.z += speed * delta;
 
-    // Clamp boundary — stop well before the end wall
-    camera.position.z = Math.max(-31, Math.min(12.5, camera.position.z));
+    // Clamp boundary — stop before the end wall
+    camera.position.z = Math.max(-39, Math.min(12.5, camera.position.z));
     camera.position.x = 0;
     camera.position.y = 2;
 
     camera.lookAt(0, 2, camera.position.z - 10);
 
     // Show the end sign when close enough
-    setShowEndSign(camera.position.z < -27);
+    setShowEndSign(camera.position.z < -35);
   });
 
   return (
@@ -301,37 +301,37 @@ export default function RomComRoom({ onSelectMovie }) {
 
       {/* Hallway Ceiling Mesh */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 4.5, -8.75]}>
-        <planeGeometry args={[10, 50]} />
+        <planeGeometry args={[10, 70]} />
         <meshStandardMaterial color="#fff0f5" roughness={0.8} side={THREE.DoubleSide} />
       </mesh>
 
       {/* Hallway Floor Mesh */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.95, -8.75]}>
-        <planeGeometry args={[10, 50]} />
+        <planeGeometry args={[10, 70]} />
         <meshStandardMaterial color="#fffafa" roughness={0.7} />
       </mesh>
 
       {/* Left Wall */}
       <mesh position={[-5, 1.8, -8.75]} rotation={[0, Math.PI / 2, 0]}>
-        <planeGeometry args={[50, 6]} />
+        <planeGeometry args={[70, 6]} />
         <meshStandardMaterial color="#fff0f5" roughness={0.9} />
       </mesh>
 
       {/* Right Wall */}
       <mesh position={[5, 1.8, -8.75]} rotation={[0, -Math.PI / 2, 0]}>
-        <planeGeometry args={[50, 6]} />
+        <planeGeometry args={[70, 6]} />
         <meshStandardMaterial color="#fff0f5" roughness={0.9} />
       </mesh>
 
       {/* End Wall */}
-      <mesh position={[0, 1.8, -37.5]} rotation={[0, 0, 0]}>
+      <mesh position={[0, 1.8, -43.75]} rotation={[0, 0, 0]}>
         <planeGeometry args={[10, 6]} />
-        <meshStandardMaterial color="#ffe4e1" roughness={1.0} />
+        <meshBasicMaterial color="#fff0f5" />
       </mesh>
 
       {/* Cute End Sign — only when close */}
       {showEndSign && (
-        <Html position={[0, 2.0, -37.4]} center transform zIndexRange={[0, 0]}>
+        <Html position={[0, 2.0, -43.65]} center transform zIndexRange={[0, 0]}>
           <div style={{
             textAlign: 'center',
             color: '#ff69b4',
@@ -340,9 +340,9 @@ export default function RomComRoom({ onSelectMovie }) {
             userSelect: 'none',
             pointerEvents: 'none',
           }}>
-            <h1 style={{ fontSize: '32px', margin: '0 0 10px 0', letterSpacing: '4px', fontWeight: 'bold' }}>THE END</h1>
+            <h1 style={{ fontSize: '24px', margin: '0 0 10px 0', letterSpacing: '4px', fontWeight: 'bold' }}>HAPPILY EVER AFTER</h1>
             <p style={{
-              fontSize: '12px',
+              fontSize: '10px',
               color: '#ff69b4',
               fontFamily: '"Segoe UI", sans-serif',
               letterSpacing: '1px',
@@ -351,7 +351,7 @@ export default function RomComRoom({ onSelectMovie }) {
               maxWidth: '300px',
               lineHeight: '1.5'
             }}>
-              That's all the love stories... for now...
+              Every great love story must come to an end, but yours is just beginning...
             </p>
           </div>
         </Html>
@@ -360,7 +360,7 @@ export default function RomComRoom({ onSelectMovie }) {
       {/* Back Entrance Wall */}
       <mesh position={[0, 1.8, 13.0]} rotation={[0, Math.PI, 0]}>
         <planeGeometry args={[10, 6]} />
-        <meshStandardMaterial color="#ffe4e1" roughness={1.0} />
+        <meshBasicMaterial color="#fff0f5" />
       </mesh>
 
       {/* Movie Posters */}
