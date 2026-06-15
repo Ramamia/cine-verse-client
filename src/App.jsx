@@ -6,9 +6,9 @@ import { Loader, MeshReflectorMaterial, Environment, OrbitControls } from '@reac
 import Entrance        from './pages/Entrance';
 import GrandRotunda    from './pages/GrandRotunda';
 import CharacterCreator from './pages/CharacterCreator';
-import HorrorRoom      from './pages/HorrorRoom';
-import RomComRoom      from './pages/RomComRoom';
-import ScifiRoom       from './pages/ScifiRoom';
+import HorrorRoom, { MOVIES as horrorMovies } from './pages/HorrorRoom';
+import RomComRoom, { ROMCOM_MOVIES as romcomMovies } from './pages/RomComRoom';
+import ScifiRoom, { SCIFI_MOVIES as scifiMovies } from './pages/ScifiRoom';
 import LoadingScreen   from './pages/LoadingScreen';
 
 // UI components
@@ -58,8 +58,9 @@ function EntranceCamera() {
 // ─── App ──────────────────────────────────────────────────────────────────────
 function App() {
   const [step,          setStep]          = useState('entrance');
-  const [isLoading,     setIsLoading]     = useState(false);
   const [activeGenre,   setActiveGenre]   = useState(null);
+  const [isLoading,     setIsLoading]     = useState(false);
+  const [searchError,   setSearchError]   = useState(null);
   const [selectedGenre, setSelectedGenre] = useState('ALL');
   const [config,        setConfig]        = useState({ acc: null, hair: null, skin: '#ffdbac' });
   const [user,          setUser]          = useState({
@@ -86,7 +87,29 @@ function App() {
     }, 2500); // Snappy loading screen response
   };
 
-  const handleSearch = (val) => console.log('Searching TMDB for:', val);
+  const handleSearch = (val, genreFilter) => {
+    if (!val || !val.trim()) return;
+    const query = val.toLowerCase();
+    const allMovies = [
+      ...horrorMovies.map(m => ({ ...m, genreId: 'horror' })),
+      ...romcomMovies.map(m => ({ ...m, genreId: 'romcom' })),
+      ...scifiMovies.map(m => ({ ...m, genreId: 'scifi' })),
+    ];
+    
+    let filtered = allMovies;
+    if (genreFilter === 'HORROR') filtered = filtered.filter(m => m.genreId === 'horror');
+    else if (genreFilter === 'ROM-COM') filtered = filtered.filter(m => m.genreId === 'romcom');
+    else if (genreFilter === 'SCI-FI') filtered = filtered.filter(m => m.genreId === 'scifi');
+
+    const found = filtered.find(m => m.title.toLowerCase().includes(query));
+    if (found) {
+      setSearchError(null);
+      enterGenrePortal(found.genreId);
+      setTimeout(() => setSelectedMovie(found), 2500);
+    } else {
+      setSearchError("THIS MOVIE DOESN'T EXIST YET! COMING SOON.");
+    }
+  };
 
   const currentSettings = step === 'genrePage' 
     ? (activeGenre === 'romcom' ? roomSettings.romcomPage : activeGenre === 'scifi' ? roomSettings.scifiPage : roomSettings.genrePage)
@@ -251,6 +274,13 @@ function App() {
             minPolarAngle={Math.PI / 2.5}   maxPolarAngle={Math.PI / 2.1}
           />
         )}
+        {step === 'customize' && (
+          <OrbitControls
+            enablePan={false} enableZoom={true} enableRotate
+            minDistance={1} maxDistance={10}
+            target={[-0.3, 2.67, 5.6]}
+          />
+        )}
         {step === 'hub' && (
           <OrbitControls
             enablePan={false}
@@ -337,6 +367,52 @@ function App() {
           followedFriends={user.following}
           genre={activeGenre}
         />
+      )}
+
+      {searchError && (
+        <div style={{
+          position: 'fixed',
+          top: 0, left: 0, right: 0, bottom: 0,
+          background: 'rgba(0, 0, 0, 0.8)',
+          zIndex: 2000,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          backdropFilter: 'blur(5px)',
+        }}>
+          <div style={{
+            background: '#111',
+            border: '2px solid #760707',
+            padding: '40px',
+            borderRadius: '8px',
+            textAlign: 'center',
+            boxShadow: '0 0 30px rgba(118, 7, 7, 0.5)',
+            maxWidth: '400px',
+          }}>
+            <h2 style={{ color: '#ff4444', letterSpacing: '3px', margin: '0 0 20px 0', fontFamily: 'monospace' }}>
+              ACCESS DENIED
+            </h2>
+            <p style={{ color: '#fff', opacity: 0.8, letterSpacing: '1px', marginBottom: '30px' }}>
+              {searchError}
+            </p>
+            <button
+              onClick={() => setSearchError(null)}
+              style={{
+                background: '#760707',
+                color: '#fff',
+                border: 'none',
+                padding: '10px 30px',
+                cursor: 'pointer',
+                fontWeight: 'bold',
+                letterSpacing: '2px',
+                borderRadius: '4px',
+                transition: 'all 0.3s ease',
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 0 15px #760707'}
+              onMouseLeave={(e) => e.currentTarget.style.boxShadow = 'none'}
+            >
+              DISMISS
+            </button>
+          </div>
+        </div>
       )}
 
       <Loader />

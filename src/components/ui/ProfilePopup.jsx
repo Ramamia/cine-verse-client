@@ -103,12 +103,12 @@ export default function ProfilePopup({ user, config, setUser, onClose, onEditAva
   const activeOffsets = MODEL_OFFSETS[modelPath] || { position: [0, 0, 0], scale: 2.5 };
   
   // Set desired world target coordinates for the avatar inside the ticket stub preview
-  // targetX = 0.0 (shifts left inside the ticket's canvas box)
-  // targetY = -0.7 (raises the avatar slightly)
-  // targetZ = 0.2 (brings the avatar closer to the camera)
-  const targetX = 0.0;
-  const targetY = -0.7;
-  const targetZ = 0.2;
+  // targetX = 0.05 (shifts right inside the ticket's canvas box)
+  // targetY = -0.65 (raises the avatar slightly)
+  // targetZ = 0.25 (brings the avatar closer to the camera)
+  const targetX = 0.03;
+  const targetY = -1.3;
+  const targetZ = 0.55;
 
   const parentPosX = targetX - (activeOffsets.position[0] ?? 0);
   const parentPosY = targetY - (activeOffsets.position[1] ?? 0);
@@ -312,7 +312,7 @@ export default function ProfilePopup({ user, config, setUser, onClose, onEditAva
                 <ambientLight intensity={0.8} />
                 <pointLight position={[5, 5, 5]} intensity={1.5} color="#760707" />
                 <pointLight position={[-5, -5, -5]} intensity={0.5} color="#00d4ff" />
-                <group position={[parentPosX, parentPosY, parentPosZ]} rotation={[-0.05, 0, 0]}>
+                <group position={[parentPosX, parentPosY, parentPosZ]} rotation={[-0.15, 0, 0]}>
                   <Avatar config={config} accessories={accessories} isPreview={true} />
                 </group>
                 <OrbitControls

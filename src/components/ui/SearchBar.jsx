@@ -16,19 +16,41 @@ const getGenreColor = (genre) => GENRE_COLORS[genre] ?? '#760707';
 const SearchBar = ({ onSearch }) => {
   const [selectedGenre, setSelectedGenre] = useState('ALL');
 
-  const handleChange = (e) => {
-    if (onSearch) onSearch(e.target.value, selectedGenre);
+  const [searchValue, setSearchValue] = useState('');
+
+  const handleSearchClick = () => {
+    if (onSearch) onSearch(searchValue, selectedGenre);
   };
 
   return (
     <div style={searchWrapper}>
       <div style={searchGlassContainer}>
-        <input
-          type="text"
-          placeholder={`SEARCHING ${selectedGenre === 'ALL' ? 'CINEMA' : selectedGenre}...`}
-          style={searchField}
-          onChange={handleChange}
-        />
+        <div style={{ display: 'flex', width: '100%', alignItems: 'center' }}>
+          <input
+            type="text"
+            placeholder={`SEARCHING ${selectedGenre === 'ALL' ? 'CINEMA' : selectedGenre}...`}
+            style={{ ...searchField, flex: 1 }}
+            value={searchValue}
+            onChange={(e) => setSearchValue(e.target.value)}
+            onKeyDown={(e) => { if (e.key === 'Enter') handleSearchClick(); }}
+          />
+          <button
+            onClick={handleSearchClick}
+            style={{
+              background: 'transparent',
+              border: `1px solid ${getGenreColor(selectedGenre)}`,
+              color: getGenreColor(selectedGenre),
+              padding: '8px 16px',
+              marginLeft: '10px',
+              cursor: 'pointer',
+              fontWeight: 'bold',
+              borderRadius: '4px',
+              letterSpacing: '2px',
+            }}
+          >
+            SEARCH
+          </button>
+        </div>
         <div style={filterBar}>
           {GENRES.map((genre) => (
             <div

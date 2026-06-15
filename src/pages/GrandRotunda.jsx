@@ -14,6 +14,7 @@ const GENRES = [
     rotY: -5.7,
     lightPos: [0, -1, 3],
     popupPos: [-1, 5.5, -5],
+    actionText: 'CLICK TO ENTER THIS LOVEY DOVEY ROOM',
   },
   {
     id: 'horror',
@@ -26,6 +27,7 @@ const GENRES = [
     rotY: 0,
     lightPos: [9, 1, 1.2],
     popupPos: [9, 5.5, 0],
+    actionText: 'ENTER IF YOU DARE',
   },
   {
     id: 'scifi',
@@ -38,6 +40,7 @@ const GENRES = [
     rotY: 5.9,
     lightPos: [15.5, 5, 7],
     popupPos: [15.5, 5.5, 7],
+    actionText: 'CLICK TO EXPLORE SOMETHING SPOOKY',
   },
 ];
 
@@ -126,7 +129,7 @@ export default function GrandRotunda({ config, enterGenrePortal }) {
                 </h4>
                 <div style={{ height: '1px', background: g.color, margin: '10px 0', opacity: 0.5 }} />
                 <p style={{ fontSize: '0.65rem', opacity: 0.7, margin: 0, color: g.color, fontWeight: 'bold' }}>
-                  ENTER PORTAL
+                  {g.actionText}
                 </p>
               </div>
             </Html>
