@@ -13,6 +13,7 @@ import RomComRoom from './pages/RomComRoom';
 import ScifiRoom from './pages/ScifiRoom';
 
 import LoadingScreen   from './pages/LoadingScreen';
+import NotFound        from './pages/NotFound';
 
 // ui stuff
 import Header          from './components/ui/Header';
@@ -82,6 +83,8 @@ function App() {
   else if (path.startsWith('/vault/')) {
     step = 'genrePage';
     activeGenre = path.split('/')[2]; // e.g., 'horror'
+  } else {
+    step = 'notfound';
   }
 
   const enterGenrePortal = (genreId) => {
@@ -148,11 +151,25 @@ function App() {
 
       {isLoading && <LoadingScreen genre={typeof isLoading === 'string' ? isLoading : activeGenre} />}
 
+      {step === 'notfound' && <NotFound />}
+
       {step === 'entrance' && (
         <>
           <Header />
-          <AuthModal onLogin={({ email }) => {
-            setUser(prev => ({ ...prev, email }));
+          <AuthModal onLogin={(userData) => {
+            setUser(prev => ({
+              ...prev,
+              id: userData.id,
+              email: userData.email,
+              nickname: userData.nickname || prev.nickname,
+            }));
+            if (userData.avatar_skin) {
+              setConfig(prev => ({
+                ...prev,
+                skin: userData.avatar_skin,
+                acc: userData.avatar_acc || prev.acc,
+              }));
+            }
             navigate('/customize');
           }} />
         </>

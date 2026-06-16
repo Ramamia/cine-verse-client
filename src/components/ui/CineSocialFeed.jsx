@@ -85,7 +85,7 @@ const CineSocialFeed = ({ feedItems = FEED_ITEMS, following = [], onToggleFollow
       <h4 style={panelHeader}>CINE-SOCIAL</h4>
       <div className="feed-scrollbar" style={{ flex: 1, overflowY: 'auto', paddingRight: '5px' }}>
         {feedItems.map((item, idx) => {
-          const user = item.nickname || item.user || 'ANONYMOUS';
+          const user = item.user_nickname || item.nickname || item.user || 'ANONYMOUS';
           const userId = item.user_id || item.user;
           const rating = typeof item.rating === 'number' ? `★ ${item.rating}` : item.rating;
           const comment = item.comment;

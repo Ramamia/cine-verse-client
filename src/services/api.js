@@ -122,8 +122,22 @@ export const api = {
   },
 
   // Assets
+  getAssets: async (prefix) => {
+    let url = `${API_BASE_URL}/assets`;
+    if (prefix) url += `?prefix=${encodeURIComponent(prefix)}`;
+    const res = await fetch(url);
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.error || 'Failed to fetch assets');
+    }
+    return res.json();
+  },
+
+  // kept for backward compat — just calls getAssets with prefix
   getAssetsByCategory: async (prefix) => {
-    const res = await fetch(`${API_BASE_URL}/assets/category/${prefix}`);
+    let url = `${API_BASE_URL}/assets`;
+    if (prefix) url += `?prefix=${encodeURIComponent(prefix)}`;
+    const res = await fetch(url);
     if (!res.ok) {
       const err = await res.json();
       throw new Error(err.error || 'Failed to fetch assets');
