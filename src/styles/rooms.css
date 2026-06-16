@@ -1,0 +1,222 @@
+/* rooms.css */
+
+.genre-room-banner {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  font-family: monospace;
+  font-size: 0.85rem;
+  letter-spacing: 2px;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.genre-room-alert-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(5px);
+  background: rgba(0, 0, 0, 0.85);
+}
+
+.genre-room-alert-box {
+  padding: 40px;
+  border-radius: 8px;
+  text-align: center;
+  max-width: 450px;
+  font-family: monospace;
+  box-shadow: 0 0 35px rgba(0, 0, 0, 0.7);
+}
+
+.genre-room-alert-title {
+  margin: 0 0 10px 0;
+  font-weight: bold;
+}
+
+.genre-room-alert-text {
+  font-size: 14px;
+  line-height: 1.6;
+  margin-bottom: 30px;
+  color: #fff;
+  opacity: 0.9;
+}
+
+.pointer-cursor {
+  cursor: pointer;
+}
+
+/* Rotunda details card */
+.rotunda-card-title {
+  margin: 0;
+  letter-spacing: 5px;
+  font-size: 1rem;
+}
+
+.rotunda-card-sub {
+  margin: 5px 0;
+  font-size: 0.75rem;
+  opacity: 0.8;
+  font-weight: normal;
+}
+
+.rotunda-card-desc {
+  font-size: 0.65rem;
+  opacity: 0.7;
+  margin: 0;
+  font-weight: bold;
+}
+
+.rotunda-genre-popup {
+  background: rgba(0,0,0,0.6);
+  color: white;
+  padding: 15px 25px;
+  border-left: 3px solid var(--genre-color);
+  text-align: center;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 0 40px rgba(255, 255, 255, 0.1);
+  width: 180px;
+  pointer-events: auto;
+  cursor: pointer;
+  font-family: "Courier New", Courier, monospace;
+  transition: 0.2s ease-in-out;
+  transform-style: preserve-3d;
+  user-select: none;
+}
+
+/* SciFi Room classes */
+.scifi-access-prompt {
+  background: rgba(255, 215, 0, 0.9);
+  color: #000;
+  font-family: monospace;
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 2px;
+  border: 1px solid #fff;
+  white-space: nowrap;
+  letter-spacing: 1px;
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.6);
+  pointer-events: none;
+  text-transform: uppercase;
+  font-weight: bold;
+}
+
+.scifi-warning-dialog {
+  text-align: center;
+  color: #00ff41;
+  font-family: "Courier New", Courier, monospace;
+  text-shadow: 0 0 10px #00ff41, 0 0 20px #00aa00;
+  user-select: none;
+  pointer-events: none;
+  background: rgba(0, 20, 0, 0.8);
+  padding: 20px;
+  border: 2px solid #00ff41;
+}
+
+.scifi-warning-title {
+  font-size: 32px;
+  margin: 0 0 10px 0;
+  letter-spacing: 6px;
+  font-weight: bold;
+}
+
+.scifi-warning-text {
+  font-size: 12px;
+  color: #00cc33;
+  letter-spacing: 2px;
+  margin: 0;
+  max-width: 300px;
+  line-height: 1.5;
+}
+
+/* RomCom Room classes */
+.romcom-access-prompt {
+  background: rgba(255, 182, 193, 0.95);
+  color: #000;
+  font-family: monospace;
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 2px;
+  border: 1px solid #fff;
+  white-space: nowrap;
+  letter-spacing: 1px;
+  box-shadow: 0 0 10px rgba(255, 105, 180, 0.6);
+  pointer-events: none;
+  text-transform: uppercase;
+  font-weight: bold;
+}
+
+.romcom-warning-dialog {
+  text-align: center;
+  color: #ff69b4;
+  font-family: "Georgia", serif;
+  text-shadow: 0 0 10px #ff69b4, 0 0 20px #ff1493;
+  user-select: none;
+  pointer-events: none;
+  background: rgba(30, 0, 15, 0.85);
+  padding: 20px;
+  border: 2px solid #ff69b4;
+  border-radius: 10px;
+}
+
+.romcom-warning-title {
+  font-size: 24px;
+  margin: 0 0 10px 0;
+  letter-spacing: 4px;
+  font-weight: bold;
+}
+
+.romcom-warning-text {
+  font-size: 12px;
+  color: #ffb6d9;
+  letter-spacing: 2px;
+  margin: 0;
+  max-width: 300px;
+  line-height: 1.5;
+}
+
+/* Horror Room classes */
+.horror-access-prompt {
+  background: rgba(118, 7, 7, 0.95);
+  color: #fff;
+  font-family: monospace;
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 2px;
+  border: 1px solid #760707;
+  white-space: nowrap;
+  letter-spacing: 1px;
+  box-shadow: 0 0 10px rgba(118, 7, 7, 0.6);
+  pointer-events: none;
+  text-transform: uppercase;
+  font-weight: bold;
+}
+
+.horror-warning-dialog {
+  text-align: center;
+  color: #760707;
+  font-family: "Creepster", "Impact", monospace;
+  text-shadow: 0 0 8px #ff4b4b, 0 0 15px #000;
+  user-select: none;
+  pointer-events: none;
+  background: rgba(10, 0, 0, 0.9);
+  padding: 25px;
+  border: 1px solid #760707;
+}
+
+.horror-warning-title {
+  font-size: 40px;
+  margin: 0 0 10px 0;
+  letter-spacing: 8px;
+}
+
+.horror-warning-text {
+  font-size: 14px;
+  color: #ff4b4b;
+  letter-spacing: 2px;
+  margin: 0;
+  max-width: 300px;
+  line-height: 1.6;
+}

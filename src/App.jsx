@@ -1,16 +1,10 @@
-import React, { useState, Suspense, useEffect } from 'react';
-import { Canvas, useFrame} from '@react-three/fiber';
-import { Loader, MeshReflectorMaterial, Environment, OrbitControls } from '@react-three/drei';
+import React, { useState, useEffect } from 'react';
+import { Loader } from '@react-three/drei';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAppContext } from './contexts/AppContext';
 
-// our big full-screen scenes
-import Entrance        from './pages/Entrance';
-import GrandRotunda    from './pages/GrandRotunda';
-import CharacterCreator from './pages/CharacterCreator';
-import HorrorRoom from './pages/HorrorRoom';
-import RomComRoom from './pages/RomComRoom';
-import ScifiRoom from './pages/ScifiRoom';
+import RoomCanvas      from './components/3d/RoomCanvas';
+import './App.css';
 
 import LoadingScreen   from './pages/LoadingScreen';
 import NotFound        from './pages/NotFound';
@@ -38,27 +32,11 @@ import {
   searchErrorTitleStyle, searchErrorTextStyle, searchErrorBtnStyle
 } from './styles/appStyles';
 
-// smooth zoom out animation for when you first enter
-function EntranceCamera() {
-  const initialized = React.useRef(false);
-  useFrame((state) => {
-    if (!initialized.current) {
-      state.camera.position.set(2, 7, 7); // start zoomed-in closer
-      initialized.current = true;
-    }
-    // smoothly pull the camera back further to zoom out
-    state.camera.position.x += (2 - state.camera.position.x) * 0.025;
-    state.camera.position.y += (8 - state.camera.position.y) * 0.025;
-    state.camera.position.z += (20 - state.camera.position.z) * 0.025;
-  });
-  return null;
-}
-
-
 // main app component where everything starts
 function App() {
   const location = useLocation();
   const navigate = useNavigate();
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
   const {
     isLoading, setIsLoading,
@@ -93,6 +71,40 @@ function App() {
       setIsLoading(false);
       navigate(`/vault/${genreId}`);
     }, 2500); // keep the loading screen snappy
+  };
+
+  const handleLogout = async () => {
+    setShowLogoutConfirm(false);
+    console.log("Saving session data for user before logging out...");
+    try {
+      if (user.id) {
+        await api.updateProfile({
+          bio: user.bio,
+          avatar_skin: config.skin,
+          avatar_acc: config.acc
+        });
+        console.log("Session data saved successfully!");
+      }
+    } catch (err) {
+      console.error("Failed to save session data:", err);
+    }
+    
+    localStorage.removeItem('cineverse_token');
+    setUser({
+      id: null,
+      nickname: '',
+      email: '',
+      bio: '',
+      topMovies: [],
+      following: [],
+    });
+    setConfig({
+      skin: 'baseAvatar.png',
+      acc: null,
+      hair: null
+    });
+    setIsProfileOpen(false);
+    navigate('/');
   };
 
   const handleSearch = (val, genreFilter) => {
@@ -139,12 +151,45 @@ function App() {
             >
               ACKNOWLEDGE
             </button>
-            <style>{`
-              @keyframes fadeInScale {
-                0% { opacity: 0; transform: scale(0.9); }
-                100% { opacity: 1; transform: scale(1); }
-              }
-            `}</style>
+          </div>
+        </div>
+      )}
+
+      {showLogoutConfirm && (
+        <div style={globalAlertOverlayStyle}>
+          <div style={globalAlertBoxStyle}>
+            <h3 style={globalAlertTitleStyle}>LOGOUT TERMINAL</h3>
+            <p style={globalAlertTextStyle}>
+              ARE YOU SURE YOU WANT TO TERMINATE YOUR SESSION AND LOG OUT?
+            </p>
+            <div style={{ display: 'flex', gap: '15px', justifyContent: 'center', marginTop: '20px' }}>
+              <button
+                onClick={handleLogout}
+                style={{
+                  ...globalAlertBtnStyle,
+                  background: '#760707',
+                  border: '1px solid #ff4b4b',
+                  margin: 0
+                }}
+                onMouseEnter={(e) => e.target.style.boxShadow = '0 0 15px rgba(255,75,75,0.8)'}
+                onMouseLeave={(e) => e.target.style.boxShadow = 'none'}
+              >
+                YES, LOGOUT
+              </button>
+              <button
+                onClick={() => setShowLogoutConfirm(false)}
+                style={{
+                  ...globalAlertBtnStyle,
+                  background: 'rgba(0,0,0,0.6)',
+                  border: '1px solid #555',
+                  margin: 0
+                }}
+                onMouseEnter={(e) => e.target.style.boxShadow = '0 0 15px rgba(255,255,255,0.2)'}
+                onMouseLeave={(e) => e.target.style.boxShadow = 'none'}
+              >
+                CANCEL
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -156,19 +201,38 @@ function App() {
       {step === 'entrance' && (
         <>
           <Header />
-          <AuthModal onLogin={(userData) => {
-            setUser(prev => ({
-              ...prev,
-              id: userData.id,
-              email: userData.email,
-              nickname: userData.nickname || prev.nickname,
-            }));
-            if (userData.avatar_skin) {
-              setConfig(prev => ({
-                ...prev,
-                skin: userData.avatar_skin,
-                acc: userData.avatar_acc || prev.acc,
-              }));
+          <AuthModal onLogin={async (userData) => {
+            try {
+              const profileRes = await api.getProfile();
+              const u = profileRes.user;
+              setUser({
+                id: u.id,
+                nickname: u.nickname,
+                email: u.email,
+                bio: u.bio || '',
+                topMovies: u.top_movies || [],
+                following: u.following || [],
+              });
+              setConfig({
+                skin: u.avatar_skin || 'baseAvatar.png',
+                acc: u.avatar_acc || null,
+                hair: null
+              });
+            } catch (err) {
+              console.error("Failed to load user profile on login:", err);
+              setUser({
+                id: userData.id,
+                nickname: userData.nickname || '',
+                email: userData.email || '',
+                bio: '',
+                topMovies: [],
+                following: [],
+              });
+              setConfig({
+                skin: userData.avatar_skin || 'baseAvatar.png',
+                acc: userData.avatar_acc || null,
+                hair: null
+              });
             }
             navigate('/customize');
           }} />
@@ -227,6 +291,14 @@ function App() {
           >
             MY PROFILE
           </button>
+
+          {/* floating logout button */}
+          <button 
+            onClick={() => setShowLogoutConfirm(true)} 
+            className="floating-logout-btn"
+          >
+            LOGOUT
+          </button>
         </>
       )}
 
@@ -271,90 +343,27 @@ function App() {
           >
             MY PROFILE
           </button>
+
+          {/* floating logout button */}
+          <button 
+            onClick={() => setShowLogoutConfirm(true)} 
+            className="floating-logout-btn"
+          >
+            LOGOUT
+          </button>
         </>
       )}
 
       {/* 3d layer where the magic happens */}
 
-      <Canvas shadows camera={{ position: currentSettings.camPos, fov: 50 }}>
-        <color attach="background" args={[currentSettings.bg]} />
-        <fog attach="fog" args={[currentSettings.bg, currentSettings.fogNear, currentSettings.fogFar]} />
-
-        {step === 'entrance' && (
-          <OrbitControls
-            enablePan={false} enableZoom={false} enableRotate
-            minDistance={180} maxDistance={200}
-            target={[-2, 10, 5]}
-            minAzimuthAngle={-Math.PI / 16} maxAzimuthAngle={Math.PI / 16}
-            minPolarAngle={Math.PI / 2.5}   maxPolarAngle={Math.PI / 2.1}
-          />
-        )}
-        {step === 'customize' && (
-          <OrbitControls
-            enablePan={false} enableZoom={true} enableRotate
-            minDistance={1} maxDistance={10}
-            target={[-0.3, 2.67, 5.6]}
-          />
-        )}
-        {step === 'hub' && (
-          <OrbitControls
-            enablePan={false}
-            maxPolarAngle={Math.PI / 2.2} minPolarAngle={Math.PI / 2.5}
-            minDistance={10} maxDistance={16}
-            target={[3.5, 4, 2]}
-            enableRotate
-            minAzimuthAngle={-Math.PI / 12} maxAzimuthAngle={Math.PI / 12}
-          />
-        )}
-
-        <Suspense fallback={null}>
-          {/* horror room has its own spooky lighting so we turn off the main lights there */}
-          {!(step === 'genrePage' && activeGenre === 'horror') && <ambientLight intensity={0.4} />}
-          {!(step === 'genrePage' && activeGenre === 'horror') && (
-            <spotLight
-              position={[0, 10, 0]}
-              intensity={step === 'hub' ? 30 : 20}
-              angle={0.5}
-              penumbra={1}
-              castShadow
-            />
-          )}
-
-          {step === 'entrance'  && (
-            <>
-              <EntranceCamera />
-              <Entrance />
-            </>
-          )}
-          {step === 'customize' && <CharacterCreator config={config} />}
-          {step === 'hub'       && <GrandRotunda enterGenrePortal={enterGenrePortal} />}
-          {step === 'genrePage' && activeGenre === 'horror' && (
-            <HorrorRoom onSelectMovie={setSelectedMovie} />
-          )}
-          {step === 'genrePage' && activeGenre === 'romcom' && (
-            <RomComRoom onSelectMovie={setSelectedMovie} />
-          )}
-          {step === 'genrePage' && activeGenre === 'scifi' && (
-            <ScifiRoom onSelectMovie={setSelectedMovie} />
-          )}
-
-          {/* cool reflective floor to tie the rooms together */}
-          <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1, 0]}>
-            <planeGeometry args={[100, 100]} />
-            <MeshReflectorMaterial
-              blur={[400, 100]}
-              resolution={1024}
-              mixBlur={1}
-              mixStrength={40}
-              roughness={1}
-              color={step === 'hub' ? '#696666' : '#312b2b'}
-              metalness={0.5}
-            />
-          </mesh>
-
-          <Environment preset="night" />
-        </Suspense>
-      </Canvas>
+      <RoomCanvas
+        step={step}
+        activeGenre={activeGenre}
+        config={config}
+        enterGenrePortal={enterGenrePortal}
+        setSelectedMovie={setSelectedMovie}
+        currentSettings={currentSettings}
+      />
 
       {/* popups and overlays that can show up anytime */}
       {isProfileOpen && (

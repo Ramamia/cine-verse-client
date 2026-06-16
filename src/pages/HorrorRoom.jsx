@@ -3,8 +3,8 @@ import { useFrame } from '@react-three/fiber';
 import { useTexture, Html, Sparkles } from '@react-three/drei';
 import * as THREE from 'three';
 import { useKeyboard } from '../hooks/useKeyboard';
-
 import { useAppContext } from '../contexts/AppContext';
+import '../styles/rooms.css';
 
 function MoviePosterMesh({ movie, index, onSelect }) {
   const [texture, setTexture] = useState(null);
@@ -101,21 +101,7 @@ function MoviePosterMesh({ movie, index, onSelect }) {
       {/* show the click prompt when they hover */}
       {hovered && (
         <Html distanceFactor={6} position={[0, -1.0, 0]} center transform rotation={[0, rotY, 0]}>
-          <div style={{
-            background: 'rgba(118, 7, 7, 0.9)',
-            color: '#fff',
-            fontFamily: 'monospace',
-            fontSize: '11px',
-            padding: '4px 10px',
-            borderRadius: '2px',
-            border: '1px solid #ff4b4b',
-            whiteSpace: 'nowrap',
-            letterSpacing: '1px',
-            boxShadow: '0 0 10px rgba(118, 7, 7, 0.8)',
-            pointerEvents: 'none',
-            textTransform: 'uppercase',
-            fontWeight: 'bold'
-          }}>
+          <div className="horror-access-prompt">
             CLICK FOR DETAILS
           </div>
         </Html>
@@ -198,23 +184,9 @@ export default function HorrorRoom({ onSelectMovie }) {
       {/* spooky dead end sign that pops up */}
       {showEndSign && (
         <Html position={[0, 2.0, -33.65]} center transform zIndexRange={[0, 0]}>
-          <div style={{
-            textAlign: 'center',
-            color: '#ff1a1a',
-            fontFamily: '"Creepster", "Courier New", Courier, monospace',
-            textShadow: '0 0 10px #760707, 0 0 20px #ff0000',
-            userSelect: 'none',
-            pointerEvents: 'none',
-          }}>
-            <h1 style={{ fontSize: '40px', margin: '0 0 10px 0', letterSpacing: '8px' }}>DEAD END</h1>
-            <p style={{
-              fontSize: '14px',
-              color: '#ff4b4b',
-              fontFamily: 'monospace',
-              letterSpacing: '2px',
-              margin: 0,
-              fontStyle: 'italic'
-            }}>
+          <div className="horror-warning-dialog">
+            <h1 className="horror-warning-title">DEAD END</h1>
+            <p className="horror-warning-text">
               You've gone too far. They are waiting for you in the dark.<br />
               Don't look behind you.
             </p>

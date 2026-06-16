@@ -69,34 +69,44 @@ export default function ProfilePopup({ user, config, setUser, onClose }) {
     ? `CV-${Math.abs(user.email.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0))}-X`
     : 'CV-9823-A';
 
-  // hit the keyless IMDb search endpoint to find movies
-  const handleSearch = async (e) => {
-    if (e) e.preventDefault();
-    if (!searchQuery.trim()) return;
-
-    setIsSearching(true);
-    setSearchError(null);
-    try {
-      const res = await fetch(`https://imdb.iamidiotareyoutoo.com/search?q=${encodeURIComponent(searchQuery)}`);
-      if (!res.ok) throw new Error('API Request Failed');
-      const data = await res.json();
-      if (data.ok && data.description) {
-        const mapped = data.description.map(item => ({
-          id: item["#IMDB_ID"] || Math.random().toString(),
-          title: item["#TITLE"] || 'Unknown Title',
-          year: item["#YEAR"] || 'N/A',
-          poster: item["#IMG_POSTER"] || null
-        }));
-        setSearchResults(mapped);
-      } else {
-        setSearchResults([]);
-      }
-    } catch {
-      setSearchError('Error loading movies. Please try again.');
+  // hit the keyless IMDb search endpoint to find movies automatically via useEffect
+  useEffect(() => {
+    if (!searchQuery.trim()) {
       setSearchResults([]);
-    } finally {
-      setIsSearching(false);
+      return;
     }
+
+    const delayDebounceFn = setTimeout(async () => {
+      setIsSearching(true);
+      setSearchError(null);
+      try {
+        const res = await fetch(`https://imdb.iamidiotareyoutoo.com/search?q=${encodeURIComponent(searchQuery)}`);
+        if (!res.ok) throw new Error('API Request Failed');
+        const data = await res.json();
+        if (data.ok && data.description) {
+          const mapped = data.description.map(item => ({
+            id: item["#IMDB_ID"] || Math.random().toString(),
+            title: item["#TITLE"] || 'Unknown Title',
+            year: item["#YEAR"] || 'N/A',
+            poster: item["#IMG_POSTER"] || null
+          }));
+          setSearchResults(mapped);
+        } else {
+          setSearchResults([]);
+        }
+      } catch {
+        setSearchError('Error loading movies. Please try again.');
+        setSearchResults([]);
+      } finally {
+        setIsSearching(false);
+      }
+    }, 500); // 500ms debounce to avoid spamming the IMDb API
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [searchQuery]);
+
+  const handleSearch = (e) => {
+    if (e) e.preventDefault();
   };
 
   const handleAddMovie = async (movie) => {
@@ -223,7 +233,8 @@ export default function ProfilePopup({ user, config, setUser, onClose }) {
                 }}
                 placeholder="ENTER YOUR CINEPHILE BIO HERE..."
                 maxLength={200}
-                style={bioTextareaStyle}
+                className="form-control bg-dark text-white border-secondary font-monospace"
+                style={{ ...bioTextareaStyle, height: '80%' }}
               />
             </div>
           </div>
@@ -273,40 +284,47 @@ export default function ProfilePopup({ user, config, setUser, onClose }) {
 
           {/* imdb search section to add to the top 5 list */}
           <div style={searchSectionStyle}>
-            <form onSubmit={handleSearch} style={searchFormStyle}>
+            <form onSubmit={handleSearch} className="d-flex gap-2 mb-3">
               <input
                 type="text"
                 placeholder="SEARCH IMDB TO ADD TO TOP 5..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                style={movieSearchInputStyle}
+                className="form-control bg-dark text-white border-danger font-monospace"
+                style={{ fontSize: '0.8rem' }}
               />
-              <button type="submit" disabled={isSearching} style={movieSearchBtnStyle}>
+              <button 
+                type="submit" 
+                disabled={isSearching} 
+                className="btn btn-outline-danger font-monospace text-uppercase"
+                style={{ fontSize: '0.8rem', whiteSpace: 'nowrap' }}
+              >
                 {isSearching ? 'SEARCHING...' : 'SEARCH'}
               </button>
             </form>
 
-            {searchError && <div style={searchErrorStyle}>{searchError}</div>}
+            {searchError && <div className="alert alert-danger py-2 px-3 font-monospace small mb-3">{searchError}</div>}
 
-            <div className="movie-slider-scrollbar" style={searchResultsContainerStyle}>
+            <div className="movie-slider-scrollbar d-flex flex-row overflow-x-auto overflow-y-hidden gap-2 pb-2" style={{ ...searchResultsContainerStyle, minHeight: '90px', maxHeight: '100px' }}>
               {searchResults.length > 0 ? (
                 searchResults.map(movie => (
-                  <div key={movie.id} style={searchResultItemStyle}>
+                  <div key={movie.id} className="d-flex flex-row align-items-center gap-2 p-1 border border-secondary rounded bg-black bg-opacity-40" style={{ flex: '0 0 160px', height: '74px', boxSizing: 'border-box' }}>
                     {movie.poster ? (
                       <img
                         src={movie.poster}
                         alt={movie.title}
                         referrerPolicy="no-referrer"
-                        style={searchResultPosterStyle}
+                        style={{ width: '42px', height: '100%', objectFit: 'cover', borderRadius: '2px' }}
                       />
                     ) : (
-                      <div style={searchResultPosterFallbackStyle}>M</div>
+                      <div className="bg-dark text-secondary d-flex align-items-center justify-content-center text-uppercase font-monospace fw-bold rounded" style={{ width: '42px', height: '100%', fontSize: '0.6rem' }}>M</div>
                     )}
-                    <div style={searchResultDetailsStyle}>
-                      <div style={searchResultTitleStyle}>{movie.title} ({movie.year})</div>
+                    <div className="d-flex flex-column justify-content-between h-100 flex-grow-1 overflow-hidden" style={{ minWidth: 0 }}>
+                      <div className="fw-bold font-monospace text-light small text-truncate m-0" style={{ fontSize: '0.6rem' }} title={movie.title}>{movie.title} <span className="text-secondary">({movie.year})</span></div>
                       <button
                         onClick={() => handleAddMovie(movie)}
-                        style={addMovieBtnStyle}
+                        className="btn btn-sm btn-outline-danger py-0 px-2 font-monospace text-uppercase fw-bold align-self-start"
+                        style={{ fontSize: '0.55rem', letterSpacing: '0.5px' }}
                       >
                         + ADD
                       </button>
@@ -315,7 +333,7 @@ export default function ProfilePopup({ user, config, setUser, onClose }) {
                 ))
               ) : (
                 !isSearching && searchQuery.trim() !== '' && (
-                  <div style={noResultsStyle}>NO MOVIES FOUND</div>
+                  <div className="text-center text-secondary py-3 font-monospace small w-100">NO MOVIES FOUND</div>
                 )
               )}
             </div>
