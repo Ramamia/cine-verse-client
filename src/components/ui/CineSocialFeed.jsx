@@ -82,8 +82,9 @@ const CineSocialFeed = ({ feedItems = FEED_ITEMS, following = [], onToggleFollow
         </span>
       </button>
 
-      <h4 style={panelHeader}>CINE-SOCIAL</h4>
-      <div className="feed-scrollbar" style={{ flex: 1, overflowY: 'auto', paddingRight: '5px' }}>
+      <h4 style={panelHeader} className="font-monospace fw-bold text-start">CINE-SOCIAL</h4>
+
+      <div className="feed-scrollbar overflow-auto pe-1" style={{ flex: 1 }}>
         {feedItems.map((item, idx) => {
           const user = item.user_nickname || item.nickname || item.user || 'ANONYMOUS';
           const userId = item.user_id || item.user;
@@ -98,22 +99,20 @@ const CineSocialFeed = ({ feedItems = FEED_ITEMS, following = [], onToggleFollow
                                 (user && currentNickname && user.toLowerCase() === currentNickname.toLowerCase());
           return (
             <div key={item.id || idx} style={feedItem}>
-              <div style={userRow}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <b>{user}</b>
+              <div className="d-flex justify-content-between align-items-center mb-1">
+                <div className="d-flex align-items-center gap-2">
+                  <b className="text-white small font-monospace">{user}</b>
                   {!isCurrentUser && (
                     <button
                       onClick={() => onToggleFollow && onToggleFollow(userId)}
+                      className={`btn btn-sm py-0 px-2 font-monospace text-uppercase fw-bold`}
                       style={{
                         background: isFollowing ? 'rgba(255, 255, 255, 0.1)' : 'rgba(203, 24, 108, 0.15)',
                         border: isFollowing ? '1px solid rgba(255, 255, 255, 0.2)' : '1px solid rgba(203, 24, 108, 0.5)',
                         borderRadius: '3px',
                         color: isFollowing ? '#aaa' : '#cb186c',
                         fontSize: '0.6rem',
-                        padding: '2px 6px',
                         cursor: 'pointer',
-                        fontFamily: 'monospace',
-                        textTransform: 'uppercase',
                         letterSpacing: '1px',
                         transition: 'all 0.2s ease',
                       }}

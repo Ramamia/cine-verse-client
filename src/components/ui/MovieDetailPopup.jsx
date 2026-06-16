@@ -6,46 +6,45 @@ import { api } from '../../services/api';
 export default function MovieDetailPopup({ movie, user, setUser, onClose, onAddReview, followedFriends = [], genre = 'horror' }) {
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState('');
-  const [selectedFriend, setSelectedFriend] = useState('');
-  const [recommendationMessage, setRecommendationMessage] = useState('');
 
   if (!movie) return null;
 
   const isFavorite = user.topMovies?.some(m => m.id === movie.id);
 
-  const handleToggleFavorite = () => {
+  const handleToggleFavorite = async () => {
     const currentFavorites = user.topMovies || [];
+    let newFavorites;
     if (isFavorite) {
-      setUser(prev => ({
-        ...prev,
-        topMovies: currentFavorites.filter(m => m.id !== movie.id)
-      }));
+      newFavorites = currentFavorites.filter(m => m.id !== movie.id);
     } else {
       if (currentFavorites.length >= 5) {
         window.dispatchEvent(new CustomEvent('show-alert', { detail: 'YOU CAN ONLY SELECT UP TO 5 FAVORITE MOVIES IN YOUR PROFILE.' }));
         return;
       }
+      newFavorites = [...currentFavorites, {
+        id: movie.id,
+        title: movie.title,
+        year: movie.release_year || movie.year,
+        poster: movie.poster_url || movie.poster
+      }];
+    }
+
+    try {
+      await api.updateTopMovies(newFavorites);
       setUser(prev => ({
         ...prev,
-        topMovies: [...currentFavorites, {
-          id: movie.id,
-          title: movie.title,
-          year: movie.release_year || movie.year,
-          poster: movie.poster_url || movie.poster
-        }]
+        topMovies: newFavorites
+      }));
+      window.dispatchEvent(new CustomEvent('show-alert', { 
+        detail: isFavorite ? 'REMOVED FROM FAVORITES!' : 'ADDED TO FAVORITES!' 
+      }));
+    } catch (err) {
+      window.dispatchEvent(new CustomEvent('show-alert', { 
+        detail: 'FAILED TO SAVE FAVORITES: ' + err.message.toUpperCase() 
       }));
     }
   };
 
-  const handleRecommend = (e) => {
-    e.preventDefault();
-    if (!selectedFriend) {
-      window.dispatchEvent(new CustomEvent('show-alert', { detail: 'PLEASE SELECT A FOLLOWED USER TO RECOMMEND TO.' }));
-      return;
-    }
-    setRecommendationMessage(`Success: Sent recommendation of "${movie.title}" to ${selectedFriend}!`);
-    setTimeout(() => setRecommendationMessage(''), 4000);
-  };
 
   const handleSubmitReview = async (e) => {
     e.preventDefault();
@@ -169,30 +168,6 @@ export default function MovieDetailPopup({ movie, user, setUser, onClose, onAddR
                 {isFavorite ? 'REMOVE FROM FAVORITES' : 'ADD TO FAVORITES'}
               </button>
 
-              {/* Recommendation Form */}
-              <div style={{ marginTop: '15px' }}>
-                <span style={metaLabelStyle}>RECOMMEND TO FRIEND</span>
-                {followedFriends.length > 0 ? (
-                  <form onSubmit={handleRecommend} style={recommendFormStyle}>
-                    <select
-                      value={selectedFriend}
-                      onChange={(e) => setSelectedFriend(e.target.value)}
-                      style={{ ...selectStyle, border: `1px solid ${themeInputBorder}` }}
-                    >
-                      <option value="">SELECT FRIEND...</option>
-                      {followedFriends.map(friend => (
-                        <option key={friend} value={friend}>{friend.toUpperCase()}</option>
-                      ))}
-                    </select>
-                    <button type="submit" style={{ ...recommendBtnStyle, background: themeAccent }}>SEND</button>
-                  </form>
-                ) : (
-                  <p style={noticeTextStyle}>FOLLOW FRIENDS IN CINE-SOCIAL TO RECOMMEND MOVIES.</p>
-                )}
-                {recommendationMessage && (
-                  <div style={successMessageStyle}>{recommendationMessage}</div>
-                )}
-              </div>
             </div>
 
             {/* Right Box: Rating Review Form */}
@@ -415,35 +390,6 @@ const favoriteBtnStyle = {
   textAlign: 'center',
 };
 
-const recommendFormStyle = {
-  display: 'flex',
-  gap: '8px',
-  marginTop: '4px',
-};
-
-const selectStyle = {
-  flex: 1,
-  background: 'rgba(0, 0, 0, 0.5)',
-  border: '1px solid rgba(118, 7, 7, 0.4)',
-  borderRadius: '4px',
-  color: '#fff',
-  fontSize: '0.75rem',
-  padding: '8px',
-  fontFamily: 'monospace',
-  outline: 'none',
-};
-
-const recommendBtnStyle = {
-  background: '#760707',
-  border: 'none',
-  borderRadius: '4px',
-  color: '#fff',
-  padding: '8px 16px',
-  fontFamily: 'monospace',
-  fontWeight: 'bold',
-  fontSize: '0.75rem',
-  cursor: 'pointer',
-};
 
 const noticeTextStyle = {
   color: '#444',

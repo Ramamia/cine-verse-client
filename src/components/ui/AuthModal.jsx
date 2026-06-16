@@ -24,14 +24,14 @@ const AuthModal = ({ onLogin }) => {
       setErrorMsg('PLEASE FILL IN ALL CREDENTIALS.');
       return;
     }
-    
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      setErrorMsg('INVALID EMAIL FORMAT DETECTED.');
-      return;
-    }
 
     if (!isLogin) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        setErrorMsg('INVALID EMAIL FORMAT DETECTED.');
+        return;
+      }
+      
       // Frontend security for signup
       if (password.length < 8) {
         setErrorMsg('PASSWORD MUST BE AT LEAST 8 CHARACTERS.');
@@ -125,15 +125,17 @@ const AuthModal = ({ onLogin }) => {
               placeholder="NICKNAME"
               value={nickname}
               onChange={(e) => setNickname(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
               style={authInput}
               required
             />
           )}
           <input
-            type="email"
-            placeholder="EMAIL ADDRESS"
+            type={isLogin ? "text" : "email"}
+            placeholder={isLogin ? "EMAIL OR NICKNAME" : "EMAIL ADDRESS"}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
             style={authInput}
             required
           />
@@ -142,6 +144,7 @@ const AuthModal = ({ onLogin }) => {
             placeholder="PASSWORD"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
             style={authInput}
             required
           />

@@ -3,6 +3,7 @@ import { useFrame } from '@react-three/fiber';
 import { useTexture, Html, Sparkles } from '@react-three/drei';
 import * as THREE from 'three';
 import { useKeyboard } from '../hooks/useKeyboard';
+import '../styles/rooms.css';
 
 import { useAppContext } from '../contexts/AppContext';
 
@@ -97,21 +98,7 @@ function MoviePosterMesh({ movie, index, onSelect }) {
       {/* popup label when hovering */}
       {hovered && (
         <Html distanceFactor={6} position={[0, -1.0, 0]} center transform rotation={[0, rotY, 0]}>
-          <div style={{
-            background: 'rgba(255, 105, 180, 0.9)',
-            color: '#fff',
-            fontFamily: 'monospace',
-            fontSize: '11px',
-            padding: '4px 10px',
-            borderRadius: '12px',
-            border: '1px solid #ffb6d9',
-            whiteSpace: 'nowrap',
-            letterSpacing: '1px',
-            boxShadow: '0 0 10px rgba(255, 105, 180, 0.6)',
-            pointerEvents: 'none',
-            textTransform: 'uppercase',
-            fontWeight: 'bold'
-          }}>
+          <div className="romcom-access-prompt">
             CLICK FOR DETAILS
           </div>
         </Html>
@@ -194,25 +181,9 @@ export default function RomComRoom({ onSelectMovie }) {
       {/* cute sign at the very end */}
       {showEndSign && (
         <Html position={[0, 2.0, -43.65]} center transform zIndexRange={[0, 0]}>
-          <div style={{
-            textAlign: 'center',
-            color: '#ff69b4',
-            fontFamily: '"Comic Sans MS", "Segoe UI", sans-serif',
-            textShadow: '0 0 10px #ffffff, 0 0 20px #ffb6d9',
-            userSelect: 'none',
-            pointerEvents: 'none',
-          }}>
-            <h1 style={{ fontSize: '24px', margin: '0 0 10px 0', letterSpacing: '4px', fontWeight: 'bold' }}>HAPPILY EVER AFTER</h1>
-            <p style={{
-              fontSize: '10px',
-              color: '#ff69b4',
-              fontFamily: '"Segoe UI", sans-serif',
-              letterSpacing: '1px',
-              margin: 0,
-              fontStyle: 'italic',
-              maxWidth: '300px',
-              lineHeight: '1.5'
-            }}>
+          <div className="romcom-warning-dialog">
+            <h1 className="romcom-warning-title">HAPPILY EVER AFTER</h1>
+            <p className="romcom-warning-text">
               Every great love story must come to an end, but yours is just beginning...
             </p>
           </div>

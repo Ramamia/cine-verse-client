@@ -1,6 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { useGLTF, Float, Html, Sparkles } from '@react-three/drei';
+import '../styles/rooms.css';
 
 const GENRES = [
   {
@@ -118,15 +119,14 @@ export default function GrandRotunda({ enterGenrePortal }) {
               sprite={false}
             >
               <div
-                style={popupStyle(g.color)}
+                style={{ '--genre-color': g.color }}
+                className="rotunda-genre-popup"
                 onClick={(e) => { e.stopPropagation(); enterGenrePortal(g.id); }}
               >
-                <h3 style={{ margin: 0, letterSpacing: '5px', fontSize: '1rem' }}>{g.name}</h3>
-                <h4 style={{ margin: '5px 0', fontSize: '0.75rem', opacity: 0.8, fontWeight: 'normal' }}>
-                  {g.desc}
-                </h4>
-                <div style={{ height: '1px', background: g.color, margin: '10px 0', opacity: 0.5 }} />
-                <p style={{ fontSize: '0.65rem', opacity: 0.7, margin: 0, color: g.color, fontWeight: 'bold' }}>
+                <h3 className="rotunda-card-title">{g.name}</h3>
+                <h4 className="rotunda-card-sub">{g.desc}</h4>
+                <div style={{ height: '1px', background: 'var(--genre-color)', margin: '10px 0', opacity: 0.5 }} />
+                <p className="rotunda-card-desc" style={{ color: 'var(--genre-color)' }}>
                   {g.actionText}
                 </p>
               </div>
@@ -140,20 +140,4 @@ export default function GrandRotunda({ enterGenrePortal }) {
   );
 }
 
-// ─── Popup style helper ───────────────────────────────────────────────────────
-const popupStyle = (color) => ({
-  background: 'rgba(0,0,0,0.6)',
-  color: 'white',
-  padding: '15px 25px',
-  borderLeft: `3px solid ${color}`,
-  textAlign: 'center',
-  backdropFilter: 'blur(10px)',
-  boxShadow: `0 0 40px ${color}33`,
-  width: '180px',
-  pointerEvents: 'auto',
-  cursor: 'pointer',
-  fontFamily: '"Courier New", Courier, monospace',
-  transition: '0.2s ease-in-out',
-  transformStyle: 'preserve-3d',
-  userSelect: 'none',
-});
+

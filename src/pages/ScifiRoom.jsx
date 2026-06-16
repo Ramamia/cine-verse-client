@@ -3,8 +3,8 @@ import { useFrame } from '@react-three/fiber';
 import { useTexture, Html, Sparkles } from '@react-three/drei';
 import * as THREE from 'three';
 import { useKeyboard } from '../hooks/useKeyboard';
-
 import { useAppContext } from '../contexts/AppContext';
+import '../styles/rooms.css';
 
 function MoviePosterMesh({ movie, onSelect }) {
   const [texture, setTexture] = useState(null);
@@ -94,21 +94,7 @@ function MoviePosterMesh({ movie, onSelect }) {
       {/* system access prompt on hover */}
       {hovered && (
         <Html distanceFactor={6} position={[0, -1.0, 0]} center transform rotation={[0, rotY, 0]}>
-          <div style={{
-            background: 'rgba(255, 215, 0, 0.9)',
-            color: '#000',
-            fontFamily: 'monospace',
-            fontSize: '11px',
-            padding: '4px 10px',
-            borderRadius: '2px',
-            border: '1px solid #fff',
-            whiteSpace: 'nowrap',
-            letterSpacing: '1px',
-            boxShadow: '0 0 10px rgba(255, 215, 0, 0.6)',
-            pointerEvents: 'none',
-            textTransform: 'uppercase',
-            fontWeight: 'bold'
-          }}>
+          <div className="scifi-access-prompt">
             SYSTEM: ACCESS DATA
           </div>
         </Html>
@@ -191,26 +177,9 @@ export default function ScifiRoom({ onSelectMovie }) {
       {/* holographic warning sign */}
       {showEndSign && (
         <Html position={[0, 2.0, -30.4]} center transform zIndexRange={[0, 0]}>
-          <div style={{
-            textAlign: 'center',
-            color: '#00ff41',
-            fontFamily: '"Courier New", Courier, monospace',
-            textShadow: '0 0 10px #00ff41, 0 0 20px #00aa00',
-            userSelect: 'none',
-            pointerEvents: 'none',
-            background: 'rgba(0,20,0,0.8)',
-            padding: '20px',
-            border: '2px solid #00ff41'
-          }}>
-            <h1 style={{ fontSize: '32px', margin: '0 0 10px 0', letterSpacing: '6px', fontWeight: 'bold' }}>SYSTEM WARNING</h1>
-            <p style={{
-              fontSize: '12px',
-              color: '#00cc33',
-              letterSpacing: '2px',
-              margin: 0,
-              maxWidth: '300px',
-              lineHeight: '1.5'
-            }}>
+          <div className="scifi-warning-dialog">
+            <h1 className="scifi-warning-title">SYSTEM WARNING</h1>
+            <p className="scifi-warning-text">
               RESTRICTED AREA.
               <br/>
               NO FURTHER DATA AVAILABLE.
