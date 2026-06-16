@@ -9,7 +9,8 @@ Cineverse is an immersive, interactive 3D web application designed as a "Cinemat
 2. [Folder Structure](#folder-structure)
 3. [Prerequisites & Installation](#prerequisites--installation)
 4. [Environment Configuration](#environment-configuration)
-5. [Key Components & Features](#key-components--features)
+5. [Deployment & API Connection Flow](#deployment--api-connection-flow)
+6. [Key Components & Features](#key-components--features)
 
 ---
 
@@ -74,12 +75,38 @@ Ensure you have the following installed on your machine:
 
 ## Environment Configuration
 
-Create a `.env` file in the root directory to point the frontend to the correct backend API server:
+Create a `.env` file in the root directory to point the frontend to the correct backend API server. You can copy the template `.env.example` file to get started:
+
+```bash
+cp .env.example .env
+```
+
+Inside `.env`, configure the API URL:
 
 ```env
-# URL of the Express API backend
+# For local development (default in .env.example):
 VITE_API_BASE_URL=http://localhost:3000/api
+
+# For production deployment:
+# VITE_API_BASE_URL=https://cine-verse-api-server-production.up.railway.app/api
 ```
+
+---
+
+## Deployment & API Connection Flow
+
+### Why We Deploy
+Local development runs on localhost, which means the website is only accessible from your own machine. By deploying the React frontend to a public cloud hosting platform (such as Railway), the application is assigned a public domain and becomes accessible to users worldwide.
+
+### How the Connection Swaps
+To retrieve movie data, avatar settings, and reviews, the React frontend must communicate with the Express API server. 
+1. **Local Development:** The frontend runs on `http://localhost:5173` and makes HTTP requests to the local Express server at `http://localhost:3000/api`.
+2. **Production Deployment:** Once deployed, the frontend cannot connect to localhost since localhost refers to the user's local machine. It must point to the production backend server instead.
+
+We manage this transition dynamically using Vite environment variables:
+- The React code references the API base URL via `import.meta.env.VITE_API_BASE_URL`.
+- During local execution, Vite reads from the local `.env` file and defaults the base URL to `http://localhost:3000/api`.
+- When building the application on Railway, the environment variable `VITE_API_BASE_URL` is set to `https://cine-verse-api-server-production.up.railway.app/api` in the service variables dashboard. Vite injects this production URL into the final built JavaScript bundle so the live website connects directly to the live backend server.
 
 ---
 
