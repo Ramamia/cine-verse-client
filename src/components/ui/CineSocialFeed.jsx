@@ -97,12 +97,15 @@ const CineSocialFeed = ({ feedItems = FEED_ITEMS, following = [], onToggleFollow
           const currentNickname = currentUser && typeof currentUser === 'object' ? currentUser.nickname : currentUser;
           const isCurrentUser = (userId && currentUserId && userId === currentUserId) || 
                                 (user && currentNickname && user.toLowerCase() === currentNickname.toLowerCase());
+          
+          const isUuid = (str) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(str);
+
           return (
             <div key={item.id || idx} style={feedItem}>
               <div className="d-flex justify-content-between align-items-center mb-1">
                 <div className="d-flex align-items-center gap-2">
                   <b className="text-white small font-monospace">{user}</b>
-                  {!isCurrentUser && (
+                  {!isCurrentUser && isUuid(userId) && (
                     <button
                       onClick={() => onToggleFollow && onToggleFollow(userId)}
                       className={`btn btn-sm py-0 px-2 font-monospace text-uppercase fw-bold`}
