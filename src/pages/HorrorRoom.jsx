@@ -12,7 +12,9 @@ function MoviePosterMesh({ movie, index, onSelect }) {
   React.useEffect(() => {
     const url = movie.poster_url || movie.poster;
     if (url) {
-      new THREE.TextureLoader().load(
+      const loader = new THREE.TextureLoader();
+      loader.setCrossOrigin('anonymous');
+      loader.load(
         url,
         (tex) => {
           tex.colorSpace = THREE.SRGBColorSpace;
